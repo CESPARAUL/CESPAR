@@ -1,0 +1,367 @@
+Home - Centre for Space Research
+
+Skip to content
+
+C
+
+e
+
+n
+
+t
+
+r
+
+e
+
+f
+
+o
+
+r
+
+S
+
+p
+
+a
+
+c
+
+e
+
+R
+
+e
+
+s
+
+e
+
+a
+
+r
+
+c
+
+h
+
+Loading
+
+info@cespar.space
+
+Mon-Sat: 9.00am To 7.00pm
+
+Anchor University Lagos
+
+Home
+
+About Us
+
+About AUL
+
+About CESPAR
+
+Our Team
+
+Testimonial
+
+Photospeak
+
+Research
+
+Our Research Works
+
+Publications
+
+Bulletin
+
+Interviews
+
+Contact
+
+Login 
+
+Call Us
+
+ +234 (0)8125541920
+
+info@cespar.space
+
+Mon-Sat: 9.00am To 7.00pm
+
+Anchor University Lagos
+
+Login 
+
+Call Us
+
+ +234 (0)8125541920
+
+Home
+
+About Us
+
+About AUL
+
+About CESPAR
+
+Our Team
+
+Testimonial
+
+Photospeak
+
+Research
+
+Our Research Works
+
+Publications
+
+Bulletin
+
+Interviews
+
+Contact
+
+",
+		"
+
+"
+		],
+		"dots": true,
+		"margin": 0
+		}'>
+
+Welcome to CESPAR !
+
+Using cutting-edge Research and Innovation
+
+Read more...
+
+Centre for Space Research (CESPAR)
+
+Exploring the Cosmos, Expanding the Future.
+
+Read more..
+
+Advancing Space Science, Empowering Earth
+
+Space is Our Lab. Discovery is Our Mission
+
+Get Started
+
+Data Archive/Real-time
+
+We ensure long-term storage and management of space data collected
+
+Radio Waves / Weather Station
+
+We are equipped with sensors and instruments to measure atmospheric conditions 24/7
+
+Satellite Technology
+
+Earth observation, weather forecasting, navigation etc
+
+Space Exploration
+
+Investigation of outer space through the use of astronomy, robotics, and spacecraft.
+
+Welcome to CESPAR
+
+Centre for Space Research 
+Anchor University
+
+Lagos
+
+Renowned as the premier IT services company in the city, our organic nation stands out for its unparalleled expertise, commitment to excellence.
+
+Discover More
+
+TEAM
+
+Meet our Team
+
+","
+
+"],
+					"dots": true,
+					"autoplay": true,
+					"autoplayTimeout": 5000,
+					"autoplayHoverPause": true,                                
+					"margin": 20,
+					"smartSpeed": 1000,
+					"stagePadding": 10,
+					"responsive": {
+						"0": {
+							"items": 1
+						},
+						"375": {
+							"items": 1
+						},
+						"575": {
+							"items": 2
+
+						},
+						"991": {
+							"items": 3
+						},
+						"1199": {
+							"items": 4
+						}
+					}
+				}'>
+
+Dr. V.U.J. Nwankwo
+
+Lead Scientist
+
+Mr. M. P. Ajakaiye
+
+Scientist
+
+Late Mr. Paul Anekwe
+
+Programmer/System Analys
+
+Dr. Ozuem Victor Edward
+
+Scientist
+
+Mr. Timothy Akinsola
+
+Engineering Technologist
+
+See All Team Members
+
+Available Space Data
+
+Space data for research work on request
+
+We aim at addressing the dearth of research data in the region through deployment of multiple ground-based facilities, and strengthening institutional capabilities in atmospheric, solar-terrestrial and radio science research. Among other research areas, we exploit data from very low frequency (VLF) Radiowaves receiver and other ground-based facilities (e.g., weather station) to study atmospheric and ionospheric irregularities including investigation of the diurnal and seasonal changes, atmospheric-lithospheric connections, solar-induced perturbations and their space weather implications.
+
+Data Archive
+
+We have long-term storage and management of space data
+
+Radio Waves
+
+We have electromagnetic radiation with long wavelengths and low frequencies data.
+
+Weather Station
+
+Measure and record of atmospheric conditions such as temperature, humidity, wind speed, wind direction, air pressure, and rainfall.
+
+Satellite Technology
+
+Data suitable for communication, navigation (like GPS), Earth observation, weather monitoring, and scientific research
+
+Blog &amp; News
+
+Get Update Blog &amp; News
+
+LET’S GET In TOUCH
+
+Quick Links
+
+About CESPAR
+
+About AUL
+
+Bulletin
+
+Publications
+
+Our Team
+
+Blog
+
+Get Data
+
+Grants
+
+Collaborations
+
+Contact
+
+Search
+
+Search for:
+
+Address
+
+Centre Address
+
+Faculty of Science Building, Anchor University Lagos, #1-3, Ayobo - Ipaja Road, Lagos State, Nigeria, West Africa
+
+Leave this field empty if you are human: 
+
+			Copyright © 2026 Centre for Space Research 		
+
+Customize
+
+Reject All
+
+Accept All
+
+Powered by
+
+&#10006;
+
+&#9658;
+
+Necessary Cookies
+
+Always Active
+
+ Necessary cookies enable essential site features like secure log-ins and consent preference adjustments. They do not store personal data. 
+
+None
+
+&#9658;
+
+Functional Cookies
+
+Remark
+
+ Functional cookies support features like content sharing on social media, collecting feedback, and enabling third-party tools. 
+
+None
+
+&#9658;
+
+Analytical Cookies
+
+Remark
+
+ Analytical cookies track visitor interactions, providing insights on metrics like visitor count, bounce rate, and traffic sources. 
+
+None
+
+&#9658;
+
+Advertisement Cookies
+
+Remark
+
+ Advertisement cookies deliver personalized ads based on your previous visits and analyze the effectiveness of ad campaigns. 
+
+None
+
+&#9658;
+
+Unclassified Cookies
+
+Remark
+
+ Unclassified cookies are cookies that we are in the process of classifying, together with the providers of individual cookies. 
+
+None
+
+Reject All
+
+Save My Preferences
+
+Accept All
+
+Powered by

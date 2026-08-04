@@ -1,0 +1,268 @@
+================================================================================
+SLUG: contact | TITLE: Contact
+================================================================================
+Please enable JavaScript in your browser to complete this form.
+
+Please enable JavaScript in your browser to complete this form.
+
+Name 
+*
+
+First
+
+Last
+
+Phone Number
+
+Number or Name
+
+Email 
+*
+
+Comment or Message
+
+Submit
+
+================================================================================
+SLUG: interviews | TITLE: Interviews
+================================================================================
+
+
+================================================================================
+SLUG: bulletin | TITLE: Bulletin
+================================================================================
+
+
+================================================================================
+SLUG: publications | TITLE: Publications
+================================================================================
+Aurthors
+
+Nwankwo V.U.J., W. Denig, S.K. Chakrabarti S.K., Ajakaiye M.P., Fatokun J., Akanni A.W., Raulin J-P., Correia E. and Enoh J.E., 2021.
+
+Title
+
+Atmospheric drag effects on modelled low Earth orbit (LEO) satellites during the July 2000 Bastille Day event in contrast to an interval of geomagnetically quiet conditions . Ann. Geophys., 39, 397–412, 2021
+
+Link
+
+Click Here
+.
+
+Aurthors
+
+Ogunmodimu O., Honary F., Rogers N., Richardson I.G. and Nwankwo V.U.J., 2020.
+
+Title
+
+Empirical modelling of auroral absorption during disturbed periods of interplanetary coronal mass ejection events . J Atmos. Solar-Terres. Phys., 207, 105364, doi:10.1016/j.jastp.2020.105364.
+
+Link
+
+Click Here
+
+Authors
+
+Nwankwo V.U.J., Chakrabarti S.K., Sasmal S., Denig W., M.P. Ajakaiye, T. Akinsola, M.Adeyanju, P. Anekwe, K. Iluore, M. Olatunji, D. Bhowmick, J. Fatokun, M.A. Ayoola, O.O. Soneye, and J. Ajamu, 2020
+
+Title
+
+Radio aeronomy in Nigeria: First results from very low frequency (VLF) radio waves receiving station at Anchor University, Lagos. 2020 IEEE-ICMCECS, Lagos, Nigeria , pp 1-7, DOI:10.1109/ICMCECS47690.2020.247002
+
+Link
+
+Click Here
+
+Aurthors
+
+Nwankwo V.U.J., Denig W., Ajakaiye M.P, Wahabbi Akanni, Johnson Fatokun, Jean-Pierre Raulin, Emilia Correia and John E. Enoh, 2020
+
+Title
+
+Simulation of atmospheric drag effect on low Earth orbit satellites during intervals of perturbed and quiet geomagnetic conditions in the magnetosphere-ionosphere system . 2020 IEEE-ICMCECS, Lagos, Nigeria, pp 1-7, DOI: 10.1109/ICMCECS47690.2020.247003.
+
+Link
+
+Click Here
+
+================================================================================
+SLUG: our-research-works | TITLE: Our Research Works
+================================================================================
+Research with Us
+
+We are committed to building regional and institutional database for advancing research in atmospheric and space science and associated technological innovations – towards significant contribution to sustainable development in Nigeria, Africa and the world over.
+
+We welcome viable collaborations that can create impact leading to mutual benefit. Please contact us for further interactions if you would like to collaborate or develop partnership with us.
+
+We have the following resources for research purposes:
+
+VLF Receivers
+
+Very Low Frequency receivers for terrestial atmospheric data collections.
+
+Weather Station
+
+Our weather station captures rainfall, temperature, humidity, wind speed. wind direction. sun intensity etc
+
+Network
+
+We are connected to many international space stations and share their sattelite information. We collate data from India, Germany, United Kingdom, USA etc
+
+Research Team
+
+We host researchers all over the globe. There has been rigorous research works that has led to publication of many papers in international journals. Join us.
+
+================================================================================
+SLUG: research | TITLE: Research
+================================================================================
+Research with Us
+
+We are committed to building regional and institutional database for advancing research in atmospheric and space science and associated technological innovations – towards significant contribution to sustainable development in Nigeria, Africa and the world over.
+
+We welcome viable collaborations that can create impact leading to mutual benefit. Please contact us for further interactions if you would like to collaborate or develop partnership with us.
+
+We have the following resources for research purposes:
+
+VLF Receivers
+
+Very Low Frequency receivers for terrestial atmospheric data collections.
+
+Weather Station
+
+Our weather station captures rainfall, temperature, humidity, wind speed. wind direction. sun intensity etc
+
+Network
+
+We are connected to many international space stations and share their sattelite information. We collate data from India, Germany, United Kingdom, USA etc
+
+Research Team
+
+We host researchers all over the globe. There has been rigorous research works that has led to publication of many papers in international journals. Join us.
+
+================================================================================
+SLUG: photospeak | TITLE: Photospeak
+================================================================================
+
+
+================================================================================
+SLUG: testimonial | TITLE: Testimonial
+================================================================================
+CESPAR is very useful in the study and research into the causes and effects of airborne diseases, skin cancer, radiation impacts on human beings etc and it will help our students to research into means of mitigating such effects of human negligence. This is the best place to study Physics in Nigeria.
+
+Prof. Oye Bandele
+
+Vice Chancellor
+
+The study of Physics at Anchor University is greatly enhanced by the facilities available at Center for Space Research and this helps simplify the abstract nature of space physics, making it practical-oriented. In Anchor University and Physics department in particular, we make difficult concepts simple and our experienced lecturers support and guide our students to succeed.
+
+Pastor M. O. Salami
+
+Registrar
+
+CESPAR is very useful in the study and research into the causes and effects of airborne diseases, skin cancer, radiation impacts on human beings etc and it will help our students to research into means of mitigating such effects of human negligence. This is the best place to study Physics in Nigeria.
+
+Dr. J. A. Bamikole
+
+Radiation and Nuclear Physics, Anchor University Lagos
+
+Center for Space Research has been my pride. Currently, Anchor University and the Faculty of Science and Science Education in particular is very rich in facilities vis-a-vis Physics Space Laboratory, Atomic absorption spectrometer, etc.… any aspiring student desiring to study Science related course in Anchor University Lagos is lucky as the faculty offers the best in facilities and human resources.
+
+Professor Johnson. Fatokun
+
+Dean, Faculty of Science and Science Education, AUL
+
+Anchor University Lagos, because of Center for Space Research, is now ahead of all Nigerian Universities as it presents physics live to students. Presently, such a facility does not exist in any University in Nigeria and West Africa. The laboratory will enhance studies in areas of communication technology, space physics, weather forecast, Atmospheric Physics and post graduate studies in space physics
+
+Professor B. A. Ezekoye
+
+Condensed Matter Physics, Anchor University Lagos
+
+================================================================================
+SLUG: our-team | TITLE: Our Team
+================================================================================
+Dr. V.U.J. Nwankwo
+
+Associate Professor of Physics, Director of the Centre and Lead Scientist
+
+Dr. Ozuem Victor Edward
+
+Scientist
+
+Mr. M. P. Ajakaiye
+
+Scientist
+
+Late Mr. Paul Anekwe
+
+Scientist
+
+Mr. Timothy Akinsola
+
+Scientist
+
+Mr. Joel Ajamu
+
+Technologist
+
+Engr. Ndifreke U. Ebong
+
+Programmer/Engineer
+
+Mr. Ademola Adams
+
+Technologist
+
+================================================================================
+SLUG: about-cespar | TITLE: About CESPAR
+================================================================================
+About CESPAR
+
+Center for Space Research (CESPAR), Anchor University Lagos aims at addressing the dearth of research data in the region through deployment of multiple ground-based facilities, and strengthening institutional capabilities in atmospheric, solar-terrestrial and radio science research. Among other research areas, we exploit data from very low frequency (VLF) Radiowaves receiver and other ground-based facilities (e.g., weather station) to study atmospheric and ionospheric irregularities including investigation of the diurnal and seasonal changes, atmospheric-lithospheric connections, solar-induced perturbations and their space weather implications.
+
+CESPAR was established to strengthen AUL capabilities in space sciences and research through coordinated and collaborative research and mentorship. We pursue vigorous research in atmospheric and radio sciences, solar-terrestrial Physics and space weather, to address the challenges posed by space weather to both ground-based and space-borne technology. Thus contributing to sustainable development in Nigeria, Africa and globally.
+
+================================================================================
+SLUG: about-aul | TITLE: About AUL
+================================================================================
+Anchor University Lagos
+
+The mandate of Anchor University is straightforward: Raising young men and women who are academically sound and spiritually vibrant for national and global transformation. We raise men who stand out anywhere and everywhere. Beyond this, they are primed to reflect outstanding spiritual prowess wherever they go. Although we are a young university, we are driven by a vision that is strong and appealingly novel. Our on-site campus facilities speak volumes of this reality. They also point to the readiness of the university to assert herself globally in academia. The expertise of the pioneer leaders and staff at Anchor University, coupled with the quality of our students, resonate with our goals and passion. Moreover, with the divine approval under which we operate, our success is sure.
+
+Anchor University is a unique University born in due time to address the gaps in quality education in Nigeria and beyond. But more importantly focused on raising exceptional leaders that bear the mark of Christ and are poised to brighten their corners across different walks of life, globally.
+
+The vision is to be a citadel of learning for holistic human transformation and development anchored on the tripartite wheels of Character, Competence and Courage. This vision has found expression in our Outcome-Based Education approach, which is IT-driven by diligent and competent staff in a most serene environment. We are determined to create a model University that is poised to compete with the best in the world.
+
+Established not to add up the numbers but to make a clear difference. In this journey to making a positive difference, we have with us the unflinching support of our Saviour, the steadfast Anchor in life’s stormy sea; unmistakable guidance through God’s immortal Word, the Bible; and the undaunted commitment of our proprietor-base, the Chancellor, Pastor (Dr) W.F. Kumuyi and the entire members of the Deeper Christian Life Ministry worldwide.
+
+================================================================================
+SLUG: about-us | TITLE: About Us
+================================================================================
+Center for Space Research (CESPAR), Anchor University Lagos aims at addressing the dearth of research data in the region through deployment of multiple ground-based facilities, and strengthening institutional capabilities in atmospheric, solar-terrestrial and radio science research. Among other research areas, we exploit data from very low frequency (VLF) Radiowaves receiver and other ground-based facilities (e.g., weather station) to study atmospheric and ionospheric irregularities including investigation of the diurnal and seasonal changes, atmospheric-lithospheric connections, solar-induced perturbations and their space weather implications.
+
+CESPAR was established to strengthen AUL capabilities in space sciences and research through coordinated and collaborative research and mentorship. We pursue vigorous research in atmospheric and radio sciences, solar-terrestrial Physics and space weather, to address the challenges posed by space weather to both ground-based and space-borne technology. Thus contributing to sustainable development in Nigeria, Africa and globally.
+
+================================================================================
+SLUG: blog | TITLE: Blog
+================================================================================
+
+
+================================================================================
+SLUG: home | TITLE: Home
+================================================================================
+
+
+================================================================================
+SLUG: sample-page | TITLE: Sample Page
+================================================================================
+This is an example page. It&#8217;s different from a blog post because it will stay in one place and will show up in your site navigation (in most themes). Most people start with an About page that introduces them to potential site visitors. It might say something like this:
+
+Hi there! I&#8217;m a bike messenger by day, aspiring actor by night, and this is my website. I live in Los Angeles, have a great dog named Jack, and I like piña coladas. (And gettin&#8217; caught in the rain.)
+
+&#8230;or something like this:
+
+The XYZ Doohickey Company was founded in 1971, and has been providing quality doohickeys to the public ever since. Located in Gotham City, XYZ employs over 2,000 people and does all kinds of awesome things for the Gotham community.
+
+As a new WordPress user, you should go to 
+your dashboard
+ to delete this page and create new pages for your content. Have fun!
+

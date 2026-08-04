@@ -1,0 +1,186 @@
+@import "tailwindcss";
+
+:root {
+  /* CESPAR brand — pulled from the institutional logo (rocket badge + wordmark) */
+  --color-space-950: #05070f;
+  --color-space-900: #070b17;
+  --color-space-800: #0c1324;
+  --color-space-700: #131c34;
+  --color-space-600: #1c2848;
+
+  --color-navy-500: #1a2a6c;
+  --color-navy-400: #24399a;
+
+  --color-red-600: #b91c2c;
+  --color-red-500: #d81e2c;
+  --color-red-400: #ef4452;
+
+  --color-ember-500: #f2724f;
+  --color-ember-400: #f6906f;
+
+  --background: var(--color-space-950);
+  --foreground: #e9ecf5;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-space-950: var(--color-space-950);
+  --color-space-900: var(--color-space-900);
+  --color-space-800: var(--color-space-800);
+  --color-space-700: var(--color-space-700);
+  --color-space-600: var(--color-space-600);
+
+  --color-navy-500: var(--color-navy-500);
+  --color-navy-400: var(--color-navy-400);
+
+  --color-cespar-red: var(--color-red-500);
+  --color-cespar-red-dark: var(--color-red-600);
+  --color-cespar-red-light: var(--color-red-400);
+
+  --color-ember: var(--color-ember-500);
+  --color-ember-light: var(--color-ember-400);
+
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-inter);
+  --font-accent: var(--font-instrument-serif);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  background: var(--color-red-500);
+  color: white;
+}
+
+/* Thin, subtle scrollbar to match the dark theme */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-space-950);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-space-600);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-navy-400);
+}
+
+/* Hides the scrollbar on an otherwise-scrollable element (e.g. the
+   testimonials ticker) — still scrolls via drag/wheel/touch, just no
+   visible track/thumb. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
+
+@keyframes drift {
+  from { transform: translateY(0); }
+  to { transform: translateY(-1200px); }
+}
+
+@keyframes hero-drift {
+  0%, 8% { transform: translate(0, 0); }
+  38% { transform: translate(20px, -20px); }
+  68% { transform: translate(-20px, 20px); }
+  92%, 100% { transform: translate(0, 0); }
+}
+
+.animate-hero-drift {
+  animation: hero-drift 22s ease-in-out infinite;
+}
+
+@keyframes aurora-pan {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-twinkle {
+  animation: twinkle var(--twinkle-duration, 3s) ease-in-out infinite;
+}
+
+.bg-grid-space {
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.035) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+/* Tracked uppercase monospace label — used for eyebrows, badges, stat
+   captions and telemetry-style text throughout the site. */
+.label-mono {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+@keyframes scan-x {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(6px); }
+}
+
+@keyframes flow-arrow {
+  0% { transform: translateX(-8px); opacity: 0; }
+  20% { opacity: 1; }
+  50% { transform: translateX(6px); opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateX(16px); opacity: 0; }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+@keyframes ring-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    color: var(--color-red-400);
+    text-shadow: 0 0 6px rgba(239, 68, 68, 0.55), 0 0 16px rgba(239, 68, 68, 0.25);
+  }
+  50% {
+    color: #ff8a90;
+    text-shadow: 0 0 10px rgba(239, 68, 68, 0.9), 0 0 26px rgba(239, 68, 68, 0.5);
+  }
+}
+
+.live-badge {
+  animation: glow-pulse 2.6s ease-in-out infinite;
+}
+
+.live-dot {
+  background: var(--color-red-400);
+  box-shadow: 0 0 6px 1px var(--color-red-400), 0 0 14px 3px rgba(239, 68, 68, 0.45);
+  animation: pulse-dot 2.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-badge,
+  .live-dot,
+  .animate-hero-drift,
+  [style*="ring-spin"],
+  [style*="scan-x"],
+  [style*="flow-arrow"] {
+    animation: none !important;
+  }
+}
