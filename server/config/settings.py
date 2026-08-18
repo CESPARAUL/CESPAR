@@ -182,16 +182,19 @@ CORS_ALLOWED_ORIGINS = env.list(
 CORS_ALLOW_CREDENTIALS = True
 
 # ------------------------------------------------------------------
-# Email — Gmail SMTP (see server/.env); falls back to printing to the
-# console (and to the server log, via apps.accounts.utils) when unset.
+# Email — Resend's HTTP API (see apps.accounts.utils.send_otp_email) is the
+# primary transport when RESEND_API_KEY is set; SMTP below is the fallback
+# for environments without it (e.g. local dev), and falls back further to
+# printing to the console (and to the server log) when unset entirely.
 # ------------------------------------------------------------------
+RESEND_API_KEY = env("RESEND_API_KEY", default="")
 _default_email_backend = (
     "django.core.mail.backends.smtp.EmailBackend"
     if env("EMAIL_HOST_USER", default="")
     else "django.core.mail.backends.console.EmailBackend"
 )
 EMAIL_BACKEND = env("EMAIL_BACKEND", default=_default_email_backend)
-EMAIL_HOST = env("EMAIL_HOST", default="smtp.gmail.com")
+EMAIL_HOST = env("EMAIL_HOST", default="smtp.resend.com")
 EMAIL_PORT = env.int("EMAIL_PORT", default=587)
 EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
 EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")

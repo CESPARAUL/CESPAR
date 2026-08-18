@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}CESPAR{% endblock %}</title>
+</head>
+<body style="margin:0; padding:0; background-color:#05070f; font-family: Arial, Helvetica, sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#05070f; padding: 32px 0;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="background-color:#0c1324; border-radius: 16px; overflow: hidden; border: 1px solid rgba(216,30,44,0.16);">
+          <tr>
+            <td style="background: linear-gradient(135deg, #0c1324, #1a2a6c); padding: 28px 32px; text-align: center;">
+              <img src="{{ logo_url }}" alt="CESPAR" width="72" height="72" style="display:block; margin: 0 auto 12px; border: 0; border-radius: 50%;" />
+              <p style="margin: 0; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #ef4452;">
+                CESPAR &middot; Anchor University Lagos
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 36px 32px; color: #e9ecf5;">
+              {% block content %}{% endblock %}
+            </td>
+          </tr>
+          <tr>
+            <td style="background: #0a0f1c; padding: 22px 32px; text-align: center; border-top: 1px solid rgba(255,255,255,0.06);">
+              <p style="margin: 0 0 6px; font-size: 12px; font-weight: 700; color: rgba(233,236,245,0.7);">
+                Centre for Space Research, Anchor University Lagos
+              </p>
+              <p style="margin: 0 0 14px; font-size: 12px;">
+                <a href="mailto:info@cespar.space" style="color: rgba(255,255,255,0.45); text-decoration: none;">info@cespar.space</a>
+              </p>
+              <p style="margin: 0; font-size: 11px; color: rgba(255,255,255,0.35);">
+                &copy; {{ year }} Centre for Space Research (CESPAR). All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

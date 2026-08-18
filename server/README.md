@@ -8,7 +8,7 @@ and the research data-request workflow. See the
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env          # then fill in your Gmail app password
+cp .env.example .env          # then fill in your Resend API key
 python manage.py migrate
 python manage.py seed_data     # seeds datasets + admin@cespar.space
 python manage.py runserver 4000

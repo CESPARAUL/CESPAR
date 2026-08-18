@@ -2,6 +2,7 @@ import logging
 import secrets
 from datetime import timedelta
 
+import resend
 from django.conf import settings
 from django.contrib.auth.hashers import check_password, make_password
 from django.core.mail import send_mail
@@ -60,20 +61,46 @@ def verify_email_otp(user, code):
 
 
 def send_otp_email(user, code):
-    context = {"user": user, "code": code, "minutes": OTP_VALIDITY_MINUTES}
+    context = {
+        "user": user,
+        "code": code,
+        "minutes": OTP_VALIDITY_MINUTES,
+        "logo_url": f"{settings.FRONTEND_BASE_URL}/images/logo.png",
+        "year": timezone.now().year,
+    }
     html_content = render_to_string("accounts/email/otp_verify.html", context)
     plain_content = strip_tags(html_content)
-    try:
-        send_mail(
-            subject=f"{code} is your CESPAR verification code",
-            message=plain_content,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[user.email],
-            html_message=html_content,
-            fail_silently=True,
-        )
-    except Exception:
-        logger.exception("Failed to send OTP email to %s", user.email)
+    subject = f"{code} is your CESPAR verification code"
+
+    # Resend's HTTP API is the primary transport — Render's free tier hangs
+    # on outbound SMTP at the socket level rather than failing cleanly, which
+    # previously took the whole gunicorn worker down mid-request. SMTP is
+    # kept only as a fallback for environments without RESEND_API_KEY set
+    # (e.g. local dev using EMAIL_HOST_USER/EMAIL_HOST_PASSWORD).
+    if getattr(settings, "RESEND_API_KEY", ""):
+        try:
+            resend.api_key = settings.RESEND_API_KEY
+            resend.Emails.send({
+                "from": settings.DEFAULT_FROM_EMAIL,
+                "to": [user.email],
+                "subject": subject,
+                "html": html_content,
+                "text": plain_content,
+            })
+        except Exception:
+            logger.exception("Failed to send OTP email (Resend API) to %s", user.email)
+    else:
+        try:
+            send_mail(
+                subject=subject,
+                message=plain_content,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                html_message=html_content,
+                fail_silently=True,
+            )
+        except Exception:
+            logger.exception("Failed to send OTP email (SMTP) to %s", user.email)
 
     if settings.DEBUG:
         logger.info("[otp] Verification code for %s is: %s", user.email, code)
