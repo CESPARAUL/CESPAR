@@ -5,6 +5,7 @@ import { AuthProvider } from "@/lib/auth-context";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { FloatingWhatsApp } from "@/components/layout/FloatingWhatsApp";
+import { AccountSidebar, AccountPageShell, HideOnAccountPage } from "@/components/layout/AccountSidebar";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -51,9 +52,14 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col bg-space-950 text-foreground">
         <AuthProvider>
           <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <main className="flex-1">
+            <AccountPageShell>{children}</AccountPageShell>
+          </main>
+          <HideOnAccountPage>
+            <Footer />
+          </HideOnAccountPage>
           <FloatingWhatsApp />
+          <AccountSidebar />
         </AuthProvider>
       </body>
     </html>

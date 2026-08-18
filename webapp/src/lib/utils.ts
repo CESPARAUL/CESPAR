@@ -30,3 +30,26 @@ export function getYoutubeVideoId(url: string): string | null {
     return null;
   }
 }
+
+// Remembers which dataset a signed-out visitor tried to request, so the
+// intent survives the register/verify-email/login detour and can be
+// resumed once they're authenticated.
+const PENDING_REQUEST_KEY = "cespar_pending_request";
+
+export function setPendingRequest(dataset: { id: string; title: string }) {
+  window.localStorage.setItem(PENDING_REQUEST_KEY, JSON.stringify(dataset));
+}
+
+export function getPendingRequest(): { id: string; title: string } | null {
+  const raw = window.localStorage.getItem(PENDING_REQUEST_KEY);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+export function clearPendingRequest() {
+  window.localStorage.removeItem(PENDING_REQUEST_KEY);
+}

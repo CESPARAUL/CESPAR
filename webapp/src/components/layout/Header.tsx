@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Menu, X, LayoutDashboard, LogOut } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
+import { Avatar } from "@/components/ui/Avatar";
 import { primaryNav } from "@/data/content";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
@@ -53,15 +54,17 @@ export function Header() {
                 href="/dashboard"
                 className="inline-flex items-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-medium text-space-950/65 transition-colors hover:bg-black/[0.04] hover:text-space-950"
               >
-                <LayoutDashboard className="h-4 w-4" />
+                <span className="h-8 w-8 shrink-0 overflow-hidden rounded-full">
+                  <Avatar src={user.avatar} name={user.name} fallbackTextClassName="text-sm" />
+                </span>
                 Dashboard
               </Link>
               <button
                 onClick={logout}
-                className="inline-flex items-center gap-1.5 rounded-full p-2.5 text-space-950/50 transition-colors hover:bg-black/[0.04] hover:text-space-950"
-                aria-label="Log out"
+                className="inline-flex items-center gap-1.5 rounded-full border border-cespar-red/40 px-4 py-2.5 text-sm font-medium text-cespar-red transition-colors hover:border-transparent hover:bg-cespar-red hover:text-white"
               >
                 <LogOut className="h-4 w-4" />
+                Log out
               </button>
             </>
           ) : (

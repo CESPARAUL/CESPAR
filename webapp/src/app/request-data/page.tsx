@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Database, Radio, SatelliteDish, Archive, Magnet, CheckCircle2 } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -10,6 +11,7 @@ import { inputClasses, FormField } from "@/components/ui/FormField";
 import { StarField } from "@/components/ui/StarField";
 import { useAuth } from "@/lib/auth-context";
 import { api, ApiError } from "@/lib/api";
+import { setPendingRequest, getPendingRequest, clearPendingRequest } from "@/lib/utils";
 import type { Dataset } from "@/types";
 
 const categoryIcons: Record<string, typeof Database> = {
@@ -20,8 +22,10 @@ const categoryIcons: Record<string, typeof Database> = {
   MAGNETOMETER: Magnet,
 };
 
-export default function RequestDataPage() {
+function RequestDataContent() {
   const { user, token, loading } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [datasets, setDatasets] = useState<Dataset[]>([]);
   const [loadingDatasets, setLoadingDatasets] = useState(true);
   const [selected, setSelected] = useState<Dataset | null>(null);
@@ -31,6 +35,7 @@ export default function RequestDataPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const resumedRef = useRef(false);
 
   useEffect(() => {
     api
@@ -39,6 +44,24 @@ export default function RequestDataPage() {
       .catch(() => setError("Could not load the dataset catalogue right now."))
       .finally(() => setLoadingDatasets(false));
   }, []);
+
+  // Resume a request that was interrupted by a sign-in/register detour —
+  // either flagged in the URL (?dataset=) or remembered in localStorage.
+  useEffect(() => {
+    if (resumedRef.current || loading || !user || datasets.length === 0) return;
+    const datasetId = searchParams.get("dataset") ?? getPendingRequest()?.id;
+    if (!datasetId) return;
+
+    const match = datasets.find((d) => d.id === datasetId);
+    if (match) {
+      setSelected(match);
+      setSuccess(false);
+      setError(null);
+    }
+    resumedRef.current = true;
+    clearPendingRequest();
+    if (searchParams.get("dataset")) router.replace("/request-data");
+  }, [loading, user, datasets, searchParams, router]);
 
   async function submitRequest(e: React.FormEvent) {
     e.preventDefault();
@@ -118,7 +141,15 @@ export default function RequestDataPage() {
                         Request this dataset
                       </Button>
                     ) : (
-                      <Button href="/register" variant="outline" size="md" className="w-full">
+                      <Button
+                        variant="outline"
+                        size="md"
+                        className="w-full"
+                        onClick={() => {
+                          setPendingRequest({ id: dataset.id, title: dataset.title });
+                          router.push("/register");
+                        }}
+                      >
                         Create an account to request
                       </Button>
                     )}
@@ -229,5 +260,13 @@ export default function RequestDataPage() {
         )}
       </Container>
     </section>
+  );
+}
+
+export default function RequestDataPage() {
+  return (
+    <Suspense fallback={null}>
+      <RequestDataContent />
+    </Suspense>
   );
 }

@@ -16,11 +16,13 @@ async function request<T>(
   options: RequestInit & { token?: string | null } = {}
 ): Promise<T> {
   const { token, headers, ...rest } = options;
+  // Let the browser set its own multipart boundary — don't force JSON headers.
+  const isFormData = rest.body instanceof FormData;
 
   const res = await fetch(`${API_BASE_URL}${path}`, {
     ...rest,
     headers: {
-      "Content-Type": "application/json",
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...headers,
     },
@@ -51,4 +53,6 @@ export const api = {
       body: data ? JSON.stringify(data) : undefined,
       token,
     }),
+  patchForm: <T>(path: string, data: FormData, token?: string | null) =>
+    request<T>(path, { method: "PATCH", body: data, token }),
 };

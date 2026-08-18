@@ -23,6 +23,10 @@ type AuthContextValue = {
   }) => Promise<{ email: string }>;
   verifyEmail: (email: string, code: string) => Promise<void>;
   resendOtp: (email: string) => Promise<void>;
+  updateProfile: (data: FormData) => Promise<void>;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+  forgotPassword: (email: string) => Promise<void>;
+  resetPassword: (email: string, code: string, newPassword: string) => Promise<void>;
   logout: () => void;
 };
 
@@ -103,6 +107,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await api.post("/auth/resend-otp", { email });
   }, []);
 
+  const updateProfile = useCallback(
+    async (data: FormData) => {
+      const res = await api.patchForm<{ user: AuthUser }>("/auth/me", data, token);
+      setUser(res.user);
+    },
+    [token]
+  );
+
+  const changePassword = useCallback(
+    async (currentPassword: string, newPassword: string) => {
+      await api.post("/auth/change-password", { currentPassword, newPassword }, token);
+    },
+    [token]
+  );
+
+  const forgotPassword = useCallback(async (email: string) => {
+    await api.post("/auth/forgot-password", { email });
+  }, []);
+
+  const resetPassword = useCallback(
+    async (email: string, code: string, newPassword: string) => {
+      const res = await api.post<{ token: string; user: AuthUser }>(
+        "/auth/reset-password",
+        { email, code, newPassword }
+      );
+      applyAuth(res.token, res.user);
+    },
+    [applyAuth]
+  );
+
   const logout = useCallback(() => {
     window.localStorage.removeItem(STORAGE_KEY);
     setToken(null);
@@ -111,7 +145,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, token, loading, login, register, verifyEmail, resendOtp, logout }}
+      value={{
+        user,
+        token,
+        loading,
+        login,
+        register,
+        verifyEmail,
+        resendOtp,
+        updateProfile,
+        changePassword,
+        forgotPassword,
+        resetPassword,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>
