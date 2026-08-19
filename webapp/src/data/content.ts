@@ -468,6 +468,74 @@ export const publications: Publication[] = [
   },
 ];
 
+export type ResearchContributor = {
+  name: string;
+  /** Omitted for external/non-team co-authors — falls back to an initials avatar. */
+  photo?: string;
+};
+
+export type CompletedResearch = {
+  title: string;
+  authors: string;
+  citation: string;
+  /** Feature image pulled from the publication itself. Falls back to a plain icon tile when absent. */
+  thumbnail?: string;
+  /** Ordered lead-first — drives the circular avatar stack. */
+  contributors: ResearchContributor[];
+  featured?: boolean;
+};
+
+/** Strips a trailing "(YYYY)" and splits an author-list string into individual names. */
+function parseAuthorNames(authors: string): string[] {
+  return authors
+    .replace(/\s*\(\d{4}\)\s*$/, "")
+    .split(/,\s*|\s+and\s+/)
+    .map((name) => name.trim())
+    .filter(Boolean);
+}
+
+/** Matches an author-list name (e.g. "Nwankwo V.U.J.") to a team photo by surname. */
+function findTeamPhoto(authorName: string): string | undefined {
+  const surname = authorName.split(/\s+/)[0]?.toLowerCase();
+  if (!surname) return undefined;
+  return team.find(
+    (member) => member.name.split(/\s+/).pop()?.toLowerCase() === surname
+  )?.photo;
+}
+
+function contributorsFromAuthors(authors: string): ResearchContributor[] {
+  return parseAuthorNames(authors).map((name) => ({
+    name,
+    photo: findTeamPhoto(name),
+  }));
+}
+
+// Peer-reviewed papers and dissertations produced using CESPAR's facilities
+// and data — shown on the homepage "Completed Research" section and in full
+// on /research/completed. The first entry is the homepage feature.
+export const completedResearch: CompletedResearch[] = [
+  {
+    title:
+      "Space weather forecasting using VLF data as an indicator for ionospheric disturbance to improve space weather forecasting in Nigeria",
+    authors: "Ahmed T.S., Odeyemi O.O., Nwankwo V.U.J. (2025)",
+    citation:
+      "Anchor University Journal of Science and Technology (AUJST), Vol. 1 No. 1, pp. 1-6, 2025",
+    thumbnail: "/images/research/vlf-space-weather-figure.jpg",
+    contributors: [
+      { name: "Mr. Tolulope Ahmed", photo: "/images/team/tolulope.png" },
+      { name: "O. O. Odeyemi" },
+      { name: "Dr. V.U.J. Nwankwo", photo: "/images/team/Nwankwo.png" },
+    ],
+    featured: true,
+  },
+  ...publications.map((pub) => ({
+    title: pub.title,
+    authors: pub.authors,
+    citation: pub.citation,
+    contributors: contributorsFromAuthors(pub.authors),
+  })),
+];
+
 export const footerQuickLinks = [
   { label: "About CESPAR", href: "/about#cespar" },
   { label: "About AUL", href: "/about#aul" },
