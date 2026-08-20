@@ -10,9 +10,19 @@ export function AboutSection() {
     <section className="relative overflow-hidden bg-space-950/90 py-20 sm:py-24">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-24 top-1/2 h-[420px] w-[420px] -translate-y-1/2 opacity-[0.07] sm:h-[520px] sm:w-[520px] lg:h-[620px] lg:w-[620px]"
+        className="pointer-events-none absolute -right-24 top-1/2 flex -translate-y-1/2 items-center gap-4 opacity-[0.07]"
       >
-        <Image src="/images/logo.png" alt="" fill className="object-contain" />
+        <div className="relative h-[70px] w-[148px] shrink-0 sm:h-[90px] sm:w-[190px] lg:h-[110px] lg:w-[232px]">
+          <Image
+            src="/images/anchor-university-logo.png"
+            alt=""
+            fill
+            className="object-contain"
+          />
+        </div>
+        <div className="relative h-[420px] w-[420px] shrink-0 sm:h-[520px] sm:w-[520px] lg:h-[620px] lg:w-[620px]">
+          <Image src="/images/logo.png" alt="" fill className="object-contain" />
+        </div>
       </div>
       <Container className="relative grid gap-12 lg:grid-cols-12 lg:gap-8">
         <div className="lg:col-span-5">
