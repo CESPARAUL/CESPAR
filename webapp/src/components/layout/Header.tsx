@@ -45,16 +45,17 @@ export function Header() {
               <span className="pointer-events-none absolute inset-x-4 -bottom-0.5 h-px origin-left scale-x-0 bg-cespar-red transition-transform duration-200 ease-out group-hover:scale-x-100" />
             </Link>
           ))}
-        </nav>
-
-        <div className="hidden items-center gap-3 lg:flex">
           <Link
             href="/donate"
-            className="inline-flex items-center gap-1.5 rounded-full border border-cespar-red/40 px-4 py-2.5 text-sm font-semibold text-cespar-red transition-colors hover:border-transparent hover:bg-cespar-red hover:text-white"
+            className="group relative ml-1 inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-cespar-red transition-colors hover:text-cespar-red-dark"
           >
             <Heart className="h-4 w-4" />
             Donate
+            <span className="pointer-events-none absolute inset-x-4 -bottom-0.5 h-px origin-left scale-x-0 bg-cespar-red transition-transform duration-200 ease-out group-hover:scale-x-100" />
           </Link>
+        </nav>
+
+        <div className="hidden items-center gap-3 lg:flex">
           {!loading && user ? (
             <>
               <Link
@@ -111,15 +112,15 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
+            <Link
+              href="/donate"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2 rounded-lg px-3 py-3 text-base font-medium text-cespar-red hover:bg-black/[0.04]"
+            >
+              <Heart className="h-4 w-4" />
+              Donate
+            </Link>
             <div className="mt-3 flex flex-col gap-2.5 border-t border-black/[0.06] pt-4">
-              <Link
-                href="/donate"
-                onClick={() => setOpen(false)}
-                className="inline-flex items-center justify-center gap-1.5 rounded-full border border-cespar-red/40 px-4 py-3 text-center text-sm font-semibold text-cespar-red"
-              >
-                <Heart className="h-4 w-4" />
-                Donate
-              </Link>
               {!loading && user ? (
                 <>
                   <Link
@@ -148,8 +149,8 @@ export function Header() {
                   >
                     Log in
                   </Link>
-                  <Button href="/request-data" variant="primary" size="lg" className="uppercase">
-                    Request Data
+                  <Button href="/register" variant="primary" size="lg" className="uppercase">
+                    Create Account
                   </Button>
                 </>
               )}
