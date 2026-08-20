@@ -14,7 +14,7 @@ class UserAdmin(DjangoUserAdmin):
 
     fieldsets = (
         (None, {"fields": ("email", "password")}),
-        ("Profile", {"fields": ("name", "institution", "role")}),
+        ("Profile", {"fields": ("name", "institution", "avatar", "role")}),
         (
             "Permissions",
             {
@@ -43,7 +43,7 @@ class UserAdmin(DjangoUserAdmin):
 
 @admin.register(EmailOTP)
 class EmailOTPAdmin(admin.ModelAdmin):
-    list_display = ["user", "is_used", "attempts", "expires_at", "created_at"]
-    list_filter = ["is_used"]
+    list_display = ["user", "purpose", "is_used", "attempts", "expires_at", "created_at"]
+    list_filter = ["purpose", "is_used"]
     search_fields = ["user__email"]
     readonly_fields = ["code_hash", "created_at", "updated_at"]

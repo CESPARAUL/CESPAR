@@ -10,6 +10,7 @@ from apps.data_requests.serializers import (
     DataRequestSerializer,
     UpdateRequestStatusSerializer,
 )
+from apps.data_requests.utils import send_request_approved_email, send_request_submitted_email
 
 
 class RequestListCreateView(APIView):
@@ -25,6 +26,7 @@ class RequestListCreateView(APIView):
         serializer = CreateRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         instance = serializer.save(user=request.user)
+        send_request_submitted_email(instance)
         return Response({"request": DataRequestSerializer(instance).data}, status=201)
 
     def get(self, request):
@@ -49,12 +51,16 @@ class RequestStatusUpdateView(APIView):
 
     def patch(self, request, pk):
         try:
-            instance = DataRequest.objects.select_related("dataset").get(pk=pk)
+            instance = DataRequest.objects.select_related("dataset", "user").get(pk=pk)
         except DataRequest.DoesNotExist:
             return Response({"message": "Request not found"}, status=404)
 
+        previous_status = instance.status
         serializer = UpdateRequestStatusSerializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
+        if instance.status == DataRequest.Status.APPROVED and previous_status != DataRequest.Status.APPROVED:
+            send_request_approved_email(instance)
 
         return Response({"request": DataRequestSerializer(instance).data})

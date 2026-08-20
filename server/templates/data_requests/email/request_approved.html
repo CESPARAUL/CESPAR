@@ -1,0 +1,22 @@
+{% extends "email/_base.html" %}
+
+{% block title %}Request approved{% endblock %}
+
+{% block content %}
+<h1 style="font-size: 20px; margin: 0 0 16px; font-weight: 800; color: #ffffff;">Your request has been approved</h1>
+<p style="font-size: 14px; line-height: 1.6; color: #c7cbd8; margin: 0 0 24px;">
+  Hi {{ user.name }}, good news — your request for <strong style="color:#ffffff;">{{ data_request.dataset.title }}</strong> has been approved.
+</p>
+{% if data_request.admin_note %}
+<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin: 0 0 24px;">
+  <tr>
+    <td style="border-radius: 12px; background: #131c34; border: 1px solid rgba(216,30,44,0.3); padding: 16px 20px;">
+      <p style="margin:0; font-size: 13px; line-height:1.6; color:#c7cbd8;">{{ data_request.admin_note }}</p>
+    </td>
+  </tr>
+</table>
+{% endif %}
+<p style="font-size: 13px; color: #8b90a3; margin: 0;">
+  Log in to your CESPAR dashboard to access the dataset.
+</p>
+{% endblock %}

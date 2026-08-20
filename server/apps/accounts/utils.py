@@ -23,30 +23,31 @@ def generate_otp_code():
     return "".join(secrets.choice("0123456789") for _ in range(6))
 
 
-def create_email_otp(user):
-    """Invalidate any prior unused OTP and issue a fresh one. Returns the
-    raw code — it only ever exists in memory here, for the caller to embed
-    in the email. Only the hash is persisted."""
-    EmailOTP.objects.filter(user=user, is_used=False).update(is_used=True)
+def create_email_otp(user, purpose=EmailOTP.Purpose.EMAIL_VERIFY):
+    """Invalidate any prior unused OTP for this purpose and issue a fresh
+    one. Returns the raw code — it only ever exists in memory here, for the
+    caller to embed in the email. Only the hash is persisted."""
+    EmailOTP.objects.filter(user=user, purpose=purpose, is_used=False).update(is_used=True)
     code = generate_otp_code()
     EmailOTP.objects.create(
         user=user,
+        purpose=purpose,
         code_hash=make_password(code),
         expires_at=timezone.now() + timedelta(minutes=OTP_VALIDITY_MINUTES),
     )
     return code
 
 
-def can_resend_otp(user):
-    latest = EmailOTP.objects.filter(user=user).order_by("-created_at").first()
+def can_resend_otp(user, purpose=EmailOTP.Purpose.EMAIL_VERIFY):
+    latest = EmailOTP.objects.filter(user=user, purpose=purpose).order_by("-created_at").first()
     if not latest:
         return True
     return (timezone.now() - latest.created_at).total_seconds() > OTP_RESEND_COOLDOWN_SECONDS
 
 
-def verify_email_otp(user, code):
+def verify_email_otp(user, code, purpose=EmailOTP.Purpose.EMAIL_VERIFY):
     """Raises ValueError with a user-facing message on failure, else True."""
-    otp = EmailOTP.objects.filter(user=user, is_used=False).order_by("-created_at").first()
+    otp = EmailOTP.objects.filter(user=user, purpose=purpose, is_used=False).order_by("-created_at").first()
     if not otp or otp.expires_at < timezone.now():
         raise ValueError("This code has expired. Request a new one.")
     if otp.attempts >= OTP_MAX_ATTEMPTS:
@@ -60,7 +61,11 @@ def verify_email_otp(user, code):
     return True
 
 
-def send_otp_email(user, code):
+def send_otp_email(user, code, purpose=EmailOTP.Purpose.EMAIL_VERIFY):
+    is_reset = purpose == EmailOTP.Purpose.PASSWORD_RESET
+    template = "accounts/email/password_reset.html" if is_reset else "accounts/email/otp_verify.html"
+    subject_suffix = "password reset code" if is_reset else "verification code"
+
     context = {
         "user": user,
         "code": code,
@@ -68,9 +73,9 @@ def send_otp_email(user, code):
         "logo_url": f"{settings.FRONTEND_BASE_URL}/images/logo.png",
         "year": timezone.now().year,
     }
-    html_content = render_to_string("accounts/email/otp_verify.html", context)
+    html_content = render_to_string(template, context)
     plain_content = strip_tags(html_content)
-    subject = f"{code} is your CESPAR verification code"
+    subject = f"{code} is your CESPAR {subject_suffix}"
 
     # Resend's HTTP API is the primary transport — Render's free tier hangs
     # on outbound SMTP at the socket level rather than failing cleanly, which
@@ -103,4 +108,4 @@ def send_otp_email(user, code):
             logger.exception("Failed to send OTP email (SMTP) to %s", user.email)
 
     if settings.DEBUG:
-        logger.info("[otp] Verification code for %s is: %s", user.email, code)
+        logger.info("[otp] %s code for %s is: %s", purpose, user.email, code)

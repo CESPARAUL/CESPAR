@@ -1,0 +1,13 @@
+{% extends "email/_base.html" %}
+
+{% block title %}Request received{% endblock %}
+
+{% block content %}
+<h1 style="font-size: 20px; margin: 0 0 16px; font-weight: 800; color: #ffffff;">We've received your request</h1>
+<p style="font-size: 14px; line-height: 1.6; color: #c7cbd8; margin: 0 0 24px;">
+  Hi {{ user.name }}, thanks for your interest in <strong style="color:#ffffff;">{{ data_request.dataset.title }}</strong>. Our team will review your request and get back to you shortly.
+</p>
+<p style="font-size: 13px; color: #8b90a3; margin: 0;">
+  You can track the status of this request anytime from your CESPAR dashboard.
+</p>
+{% endblock %}

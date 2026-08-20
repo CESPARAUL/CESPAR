@@ -50,6 +50,7 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel, TimeStampedModel):
     email = models.EmailField(unique=True, db_index=True)
     name = models.CharField(max_length=200)
     institution = models.CharField(max_length=200, blank=True, null=True)
+    avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
     role = models.CharField(max_length=20, choices=Role.choices, default=Role.RESEARCHER)
 
     is_active = models.BooleanField(default=True)
@@ -73,9 +74,15 @@ class User(AbstractBaseUser, PermissionsMixin, UUIDModel, TimeStampedModel):
 
 
 class EmailOTP(TimeStampedModel):
-    """One-time 6-digit numeric code for verifying a user's email address."""
+    """One-time 6-digit numeric code, scoped to a `purpose` so an email-
+    verification code can't double as a password-reset code or vice versa."""
+
+    class Purpose(models.TextChoices):
+        EMAIL_VERIFY = "EMAIL_VERIFY", "Email verification"
+        PASSWORD_RESET = "PASSWORD_RESET", "Password reset"
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="email_otps")
+    purpose = models.CharField(max_length=20, choices=Purpose.choices, default=Purpose.EMAIL_VERIFY)
     code_hash = models.CharField(max_length=128)
     expires_at = models.DateTimeField()
     is_used = models.BooleanField(default=False)
@@ -83,7 +90,7 @@ class EmailOTP(TimeStampedModel):
 
     class Meta:
         ordering = ["-created_at"]
-        indexes = [models.Index(fields=["user", "is_used", "-created_at"])]
+        indexes = [models.Index(fields=["user", "purpose", "is_used", "-created_at"])]
 
     def __str__(self):
         return f"OTP for {self.user.email}"
