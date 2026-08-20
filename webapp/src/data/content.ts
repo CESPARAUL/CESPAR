@@ -543,5 +543,20 @@ export const footerQuickLinks = [
   { label: "Bulletins", href: "/bulletins" },
   { label: "Our Team", href: "/team" },
   { label: "Request Data", href: "/request-data" },
+  { label: "Donate", href: "/donate" },
   { label: "Contact", href: "/contact" },
 ];
+
+// Bank transfer is a placeholder route while CESPAR sets up an official
+// institutional account (and decides whether to add Paystack for
+// card/USSD donations later) — swap these details in once that lands.
+export const donationInfo = {
+  intro:
+    "CESPAR relies on donor support to maintain our ground stations, fund student research training and expand open access to space-weather data across Nigeria.",
+  note: "Please use your name or organisation as the payment reference so we can confirm and acknowledge your donation.",
+  bankTransfer: {
+    accountName: "Tolulope Ahmed",
+    bankName: "Guaranty Trust Bank (GTBank)",
+    accountNumber: "0037181980",
+  },
+};

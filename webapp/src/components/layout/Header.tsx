@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Menu, X, LogOut } from "lucide-react";
+import { Menu, X, LogOut, Heart } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
@@ -48,6 +48,13 @@ export function Header() {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
+          <Link
+            href="/donate"
+            className="inline-flex items-center gap-1.5 rounded-full border border-cespar-red/40 px-4 py-2.5 text-sm font-semibold text-cespar-red transition-colors hover:border-transparent hover:bg-cespar-red hover:text-white"
+          >
+            <Heart className="h-4 w-4" />
+            Donate
+          </Link>
           {!loading && user ? (
             <>
               <Link
@@ -105,6 +112,14 @@ export function Header() {
               </Link>
             ))}
             <div className="mt-3 flex flex-col gap-2.5 border-t border-black/[0.06] pt-4">
+              <Link
+                href="/donate"
+                onClick={() => setOpen(false)}
+                className="inline-flex items-center justify-center gap-1.5 rounded-full border border-cespar-red/40 px-4 py-3 text-center text-sm font-semibold text-cespar-red"
+              >
+                <Heart className="h-4 w-4" />
+                Donate
+              </Link>
               {!loading && user ? (
                 <>
                   <Link
