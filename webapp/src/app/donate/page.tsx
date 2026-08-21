@@ -16,9 +16,11 @@ export default function DonatePage() {
         description={donationInfo.intro}
       />
       <section className="bg-space-950 py-16 sm:py-20">
-        <Container className="max-w-xl">
-          <ImpactList />
-          <BankTransferCard />
+        <Container className="max-w-5xl">
+          <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
+            <BankTransferCard />
+            <ImpactList />
+          </div>
         </Container>
       </section>
     </>

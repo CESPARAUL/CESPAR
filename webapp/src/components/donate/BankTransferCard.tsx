@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Copy, Landmark } from "lucide-react";
+import Image from "next/image";
+import { Check, Copy } from "lucide-react";
 import { donationInfo } from "@/data/content";
 
 function CopyableRow({ label, value }: { label: string; value: string }) {
@@ -45,8 +46,13 @@ export function BankTransferCard() {
   return (
     <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
       <div className="flex items-center gap-3 border-b border-white/10 bg-white/[0.02] px-6 py-5 sm:px-8">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-navy-500/40 text-white ring-1 ring-white/10">
-          <Landmark className="h-4.5 w-4.5" />
+        <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full ring-1 ring-white/10">
+          <Image
+            src={bankTransfer.bankLogo}
+            alt={bankTransfer.bankName}
+            fill
+            className="object-cover"
+          />
         </span>
         <h2 className="font-display text-base font-semibold text-white">Bank Transfer</h2>
       </div>

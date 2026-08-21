@@ -557,6 +557,7 @@ export const donationInfo = {
   bankTransfer: {
     accountName: "Tolulope Ahmed",
     bankName: "Guaranty Trust Bank (GTBank)",
+    bankLogo: "/images/banks/gtb.png",
     accountNumber: "0037181980",
   },
   // Icon keys map to lucide-react components in ImpactList.tsx.

@@ -11,7 +11,7 @@ const icons = {
 
 export function ImpactList() {
   return (
-    <div className="mb-10">
+    <div className="rounded-3xl border border-navy-400/25 bg-gradient-to-b from-navy-500/12 to-navy-500/[0.03] p-6 sm:p-8">
       <h2 className="label-mono text-[11px] text-cespar-red-light">
         Your Donation Enables
       </h2>
@@ -21,7 +21,7 @@ export function ImpactList() {
           return (
             <div
               key={item.title}
-              className="flex gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-5"
+              className="flex gap-4 rounded-2xl border border-navy-400/20 bg-navy-500/10 p-5"
             >
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-navy-400/60 to-cespar-red/40 text-white ring-1 ring-white/15">
                 <Icon className="h-5 w-5" strokeWidth={1.75} />
