@@ -559,4 +559,37 @@ export const donationInfo = {
     bankName: "Guaranty Trust Bank (GTBank)",
     accountNumber: "0037181980",
   },
+  // Icon keys map to lucide-react components in ImpactList.tsx.
+  impact: [
+    {
+      icon: "radio",
+      title: "Ground station upkeep",
+      description:
+        "Keeps our VLF, weather and radio-wave sensors running so the sky above Nigeria stays monitored, all day.",
+    },
+    {
+      icon: "graduation",
+      title: "Student research training",
+      description:
+        "Funds the mentorship and lab time behind dissertations like the ones now published in peer-reviewed journals.",
+    },
+    {
+      icon: "globe",
+      title: "Open data access",
+      description:
+        "Keeps our dataset catalogue free and open to researchers, students and schools across Nigeria and Africa.",
+    },
+    {
+      icon: "award",
+      title: "Conferences & publications",
+      description:
+        "Gets CESPAR research in front of the world — from COSPAR to the European Space Weather Week.",
+    },
+    {
+      icon: "rocket",
+      title: "Growing space science in Africa",
+      description:
+        "Helps build the regional database and collaborations this field needs to grow across the continent.",
+    },
+  ],
 };
