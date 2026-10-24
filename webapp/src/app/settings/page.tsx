@@ -7,6 +7,7 @@ import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Button } from "@/components/ui/Button";
 import { FormField, inputClasses } from "@/components/ui/FormField";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { StarField } from "@/components/ui/StarField";
 import { Avatar } from "@/components/ui/Avatar";
 import { useAuth } from "@/lib/auth-context";
@@ -204,40 +205,34 @@ export default function SettingsPage() {
             )}
 
             <FormField label="Current password" htmlFor="current-password">
-              <input
+              <PasswordInput
                 id="current-password"
-                type="password"
-                required
+                withIcon={false}
                 autoComplete="current-password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
-                className={inputClasses}
               />
             </FormField>
 
             <FormField label="New password" htmlFor="new-password" hint="At least 8 characters">
-              <input
+              <PasswordInput
                 id="new-password"
-                type="password"
-                required
+                withIcon={false}
                 minLength={8}
                 autoComplete="new-password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className={inputClasses}
               />
             </FormField>
 
             <FormField label="Confirm new password" htmlFor="confirm-password">
-              <input
+              <PasswordInput
                 id="confirm-password"
-                type="password"
-                required
+                withIcon={false}
                 minLength={8}
                 autoComplete="new-password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className={inputClasses}
               />
             </FormField>
 

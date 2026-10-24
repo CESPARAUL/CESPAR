@@ -3,9 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Mail, Lock } from "lucide-react";
+import { Mail } from "lucide-react";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { FormField, InputIcon, inputWithIconClasses } from "@/components/ui/FormField";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/lib/auth-context";
 import { ApiError } from "@/lib/api";
@@ -64,18 +65,12 @@ export default function LoginPage() {
         </FormField>
 
         <FormField label="Password" htmlFor="password">
-          <InputIcon icon={Lock}>
-            <input
-              id="password"
-              type="password"
-              required
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={inputWithIconClasses}
-              placeholder="••••••••"
-            />
-          </InputIcon>
+          <PasswordInput
+            id="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
         </FormField>
 
         <Link

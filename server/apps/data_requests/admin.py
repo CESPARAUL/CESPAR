@@ -6,8 +6,8 @@ from apps.data_requests.utils import GENERIC_APPROVAL_MESSAGE, send_request_appr
 
 @admin.register(DataRequest)
 class DataRequestAdmin(admin.ModelAdmin):
-    list_display = ["dataset", "user", "status", "created_at"]
-    list_filter = ["status", "dataset"]
+    list_display = ["dataset", "user", "status", "archived", "created_at"]
+    list_filter = ["status", "archived", "dataset"]
     search_fields = ["user__email", "dataset__title", "purpose"]
     readonly_fields = ["created_at", "updated_at"]
     autocomplete_fields = ["user", "dataset"]

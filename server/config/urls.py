@@ -13,6 +13,7 @@ urlpatterns = [
     path("api/datasets", include("apps.datasets.urls")),
     path("api/requests", include("apps.data_requests.urls")),
     path("api/bulletins", include("apps.bulletins.urls")),
+    path("api/magnetometer", include("apps.magnetometer.urls")),
 ]
 
 if settings.DEBUG:

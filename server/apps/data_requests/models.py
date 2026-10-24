@@ -19,6 +19,7 @@ class DataRequest(UUIDModel, TimeStampedModel):
     date_range_to = models.CharField(max_length=32, blank=True, null=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     admin_note = models.TextField(blank=True, null=True)
+    archived = models.BooleanField(default=False)
 
     class Meta:
         ordering = ["-created_at"]

@@ -3,9 +3,10 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Mail, Lock } from "lucide-react";
+import { Mail } from "lucide-react";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { FormField, InputIcon, inputClasses, inputWithIconClasses } from "@/components/ui/FormField";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/lib/auth-context";
 import { ApiError } from "@/lib/api";
@@ -116,35 +117,23 @@ function ResetPasswordForm() {
         </FormField>
 
         <FormField label="New password" htmlFor="new-password" hint="At least 8 characters">
-          <InputIcon icon={Lock}>
-            <input
-              id="new-password"
-              type="password"
-              required
-              minLength={8}
-              autoComplete="new-password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              className={inputWithIconClasses}
-              placeholder="••••••••"
-            />
-          </InputIcon>
+          <PasswordInput
+            id="new-password"
+            minLength={8}
+            autoComplete="new-password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
         </FormField>
 
         <FormField label="Confirm new password" htmlFor="confirm-password">
-          <InputIcon icon={Lock}>
-            <input
-              id="confirm-password"
-              type="password"
-              required
-              minLength={8}
-              autoComplete="new-password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className={inputWithIconClasses}
-              placeholder="••••••••"
-            />
-          </InputIcon>
+          <PasswordInput
+            id="confirm-password"
+            minLength={8}
+            autoComplete="new-password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
         </FormField>
 
         <Button

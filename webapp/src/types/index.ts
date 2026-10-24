@@ -36,6 +36,27 @@ export type DataRequest = {
   dateRangeTo?: string | null;
   status: RequestStatus;
   adminNote?: string | null;
+  archived: boolean;
   createdAt: string;
   dataset: Pick<Dataset, "id" | "title" | "slug">;
+};
+
+export type MagnetometerStatus = {
+  latestReading: string | null;
+  earliestReading: string | null;
+  totalReadings: number;
+};
+
+export type MagnetometerPoint = {
+  timestamp: string;
+  x: number;
+  y: number;
+  z: number;
+  f: number;
+};
+
+export type MagnetometerLatest = {
+  hours: number;
+  count: number;
+  points: MagnetometerPoint[];
 };

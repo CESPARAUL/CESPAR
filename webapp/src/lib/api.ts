@@ -1,4 +1,4 @@
-const API_BASE_URL =
+export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
 
 export class ApiError extends Error {
@@ -11,6 +11,11 @@ export class ApiError extends Error {
   }
 }
 
+// A request that never resolves (server unreachable, connection stuck) would
+// otherwise leave any "loading" state stuck forever with no feedback — cap
+// every call so it always settles one way or another.
+const REQUEST_TIMEOUT_MS = 15000;
+
 async function request<T>(
   path: string,
   options: RequestInit & { token?: string | null } = {}
@@ -19,14 +24,28 @@ async function request<T>(
   // Let the browser set its own multipart boundary — don't force JSON headers.
   const isFormData = rest.body instanceof FormData;
 
-  const res = await fetch(`${API_BASE_URL}${path}`, {
-    ...rest,
-    headers: {
-      ...(isFormData ? {} : { "Content-Type": "application/json" }),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...headers,
-    },
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE_URL}${path}`, {
+      ...rest,
+      signal: controller.signal,
+      headers: {
+        ...(isFormData ? {} : { "Content-Type": "application/json" }),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...headers,
+      },
+    });
+  } catch (err) {
+    if (err instanceof DOMException && err.name === "AbortError") {
+      throw new ApiError("Request timed out. Check your connection and try again.", 0);
+    }
+    throw new ApiError("Could not reach the server.", 0);
+  } finally {
+    clearTimeout(timeout);
+  }
 
   const isJson = res.headers.get("content-type")?.includes("application/json");
   const body = isJson ? await res.json() : null;

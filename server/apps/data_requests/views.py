@@ -6,6 +6,7 @@ from apps.data_requests.models import DataRequest
 from apps.data_requests.permissions import IsAdmin
 from apps.data_requests.serializers import (
     AdminDataRequestSerializer,
+    ArchiveRequestSerializer,
     CreateRequestSerializer,
     DataRequestSerializer,
     UpdateRequestStatusSerializer,
@@ -35,12 +36,18 @@ class RequestListCreateView(APIView):
 
 
 class MyRequestsView(APIView):
-    """GET /api/requests/me"""
+    """GET /api/requests/me — active (non-archived) by default;
+    ?archived=true returns only archived ones instead. Ordered newest
+    request first (DataRequest.Meta.ordering)."""
 
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        requests = DataRequest.objects.select_related("dataset").filter(user=request.user)
+        show_archived = request.query_params.get("archived") == "true"
+        requests = (
+            DataRequest.objects.select_related("dataset")
+            .filter(user=request.user, archived=show_archived)
+        )
         return Response({"requests": DataRequestSerializer(requests, many=True).data})
 
 
@@ -62,5 +69,29 @@ class RequestStatusUpdateView(APIView):
 
         if instance.status == DataRequest.Status.APPROVED and previous_status != DataRequest.Status.APPROVED:
             send_request_approved_email(instance)
+
+        return Response({"request": DataRequestSerializer(instance).data})
+
+
+class RequestArchiveView(APIView):
+    """PATCH /api/requests/:id/archive — the request's own owner or an
+    admin can archive/unarchive it. Purely a visibility toggle for the
+    dashboard list — does not touch status, so it can't be used to
+    revoke or fake approval."""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def patch(self, request, pk):
+        try:
+            instance = DataRequest.objects.select_related("dataset", "user").get(pk=pk)
+        except DataRequest.DoesNotExist:
+            return Response({"message": "Request not found"}, status=404)
+
+        if instance.user_id != request.user.id and request.user.role != request.user.Role.ADMIN:
+            return Response({"message": "Not your request"}, status=403)
+
+        serializer = ArchiveRequestSerializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
         return Response({"request": DataRequestSerializer(instance).data})

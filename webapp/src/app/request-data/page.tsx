@@ -126,6 +126,15 @@ function RequestDataContent() {
                     </div>
                   </dl>
 
+                  {dataset.slug === "magnetometer-data" && (
+                    <Link
+                      href="/magnetometer"
+                      className="mt-4 text-xs font-medium text-cespar-red-light hover:text-cespar-red"
+                    >
+                      View live data →
+                    </Link>
+                  )}
+
                   <div className="mt-5">
                     {!loading && user ? (
                       <Button

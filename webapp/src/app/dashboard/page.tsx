@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Clock, CheckCircle2, XCircle, PackageCheck, ArrowRight } from "lucide-react";
+import { Clock, CheckCircle2, XCircle, PackageCheck, ArrowRight, Archive, ArchiveRestore } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Button } from "@/components/ui/Button";
@@ -28,6 +29,8 @@ export default function DashboardPage() {
   const [requests, setRequests] = useState<DataRequest[]>([]);
   const [loadingRequests, setLoadingRequests] = useState(true);
   const [pending, setPending] = useState<{ id: string; title: string } | null>(null);
+  const [showArchived, setShowArchived] = useState(false);
+  const [archivingId, setArchivingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -41,11 +44,23 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!token) return;
+    setLoadingRequests(true);
     api
-      .get<{ requests: DataRequest[] }>("/requests/me", token)
+      .get<{ requests: DataRequest[] }>(`/requests/me?archived=${showArchived}`, token)
       .then((res) => setRequests(res.requests))
       .finally(() => setLoadingRequests(false));
-  }, [token]);
+  }, [token, showArchived]);
+
+  async function toggleArchive(request: DataRequest) {
+    if (!token) return;
+    setArchivingId(request.id);
+    try {
+      await api.patch(`/requests/${request.id}/archive`, { archived: !request.archived }, token);
+      setRequests((prev) => prev.filter((r) => r.id !== request.id));
+    } finally {
+      setArchivingId(null);
+    }
+  }
 
   if (loading || !user) {
     return (
@@ -88,17 +103,37 @@ export default function DashboardPage() {
           </div>
         )}
 
-        <div className="mt-10 overflow-hidden rounded-2xl border border-navy-400/40 bg-gradient-to-br from-navy-500/85 to-navy-500/55">
+        <div className="mt-10 flex items-center gap-1 rounded-full border border-white/15 bg-white/5 p-1 self-start">
+          {(["active", "archived"] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setShowArchived(tab === "archived")}
+              className={`rounded-full px-4 py-1.5 text-sm font-medium capitalize transition-colors ${
+                (tab === "archived") === showArchived
+                  ? "bg-cespar-red text-white"
+                  : "text-white/60 hover:text-white"
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-4 overflow-hidden rounded-2xl border border-navy-400/40 bg-gradient-to-br from-navy-500/85 to-navy-500/55">
           {loadingRequests ? (
             <p className="p-8 text-center text-sm text-white/50">Loading requests…</p>
           ) : requests.length === 0 ? (
             <div className="p-10 text-center">
               <p className="text-sm text-white/70">
-                You haven&apos;t requested any datasets yet.
+                {showArchived
+                  ? "No archived requests."
+                  : "You haven't requested any datasets yet."}
               </p>
-              <Button href="/request-data" variant="outline" className="mt-4">
-                Browse the catalogue
-              </Button>
+              {!showArchived && (
+                <Button href="/request-data" variant="outline" className="mt-4">
+                  Browse the catalogue
+                </Button>
+              )}
             </div>
           ) : (
             <table className="w-full text-left text-sm">
@@ -107,6 +142,7 @@ export default function DashboardPage() {
                   <th className="px-5 py-3.5 font-medium">Dataset</th>
                   <th className="hidden px-5 py-3.5 font-medium sm:table-cell">Requested</th>
                   <th className="px-5 py-3.5 font-medium">Status</th>
+                  <th className="px-5 py-3.5 font-medium" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/10">
@@ -133,12 +169,42 @@ export default function DashboardPage() {
                         })}
                       </td>
                       <td className="px-5 py-4">
-                        <span
-                          className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${status.className}`}
+                        <div className="flex items-center gap-3">
+                          <span
+                            className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${status.className}`}
+                          >
+                            <status.icon className="h-3.5 w-3.5" />
+                            {status.label}
+                          </span>
+                          {r.dataset.slug === "magnetometer-data" &&
+                            (r.status === "APPROVED" || r.status === "FULFILLED") && (
+                              <Link
+                                href="/magnetometer"
+                                className="text-xs font-medium text-cespar-red-light hover:text-cespar-red"
+                              >
+                                View live data →
+                              </Link>
+                            )}
+                        </div>
+                      </td>
+                      <td className="px-5 py-4 text-right">
+                        <button
+                          onClick={() => toggleArchive(r)}
+                          disabled={archivingId === r.id}
+                          className="inline-flex items-center gap-1.5 text-xs font-medium text-white/50 hover:text-white disabled:opacity-40"
                         >
-                          <status.icon className="h-3.5 w-3.5" />
-                          {status.label}
-                        </span>
+                          {r.archived ? (
+                            <>
+                              <ArchiveRestore className="h-3.5 w-3.5" />
+                              Unarchive
+                            </>
+                          ) : (
+                            <>
+                              <Archive className="h-3.5 w-3.5" />
+                              Archive
+                            </>
+                          )}
+                        </button>
                       </td>
                     </tr>
                   );

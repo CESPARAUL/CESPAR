@@ -31,6 +31,7 @@ class DataRequestSerializer(serializers.ModelSerializer):
             "date_range_to",
             "status",
             "admin_note",
+            "archived",
             "created_at",
             "dataset",
         ]
@@ -56,3 +57,9 @@ class UpdateRequestStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = DataRequest
         fields = ["status", "admin_note"]
+
+
+class ArchiveRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DataRequest
+        fields = ["archived"]
