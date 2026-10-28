@@ -24,9 +24,9 @@ export default function BulletinsPage() {
                 href={bulletin.pdf}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group block overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] transition-colors hover:border-cespar-red/40"
+                className="group block overflow-hidden rounded-2xl border border-white/10 bg-white/3 transition-colors hover:border-cespar-red/40"
               >
-                <div className="relative aspect-[3/4] w-full overflow-hidden border-b border-white/10 bg-white">
+                <div className="relative aspect-3/4 w-full overflow-hidden border-b border-white/10 bg-white">
                   <Image
                     src={bulletin.cover}
                     alt={`${bulletin.title} cover`}
@@ -34,7 +34,7 @@ export default function BulletinsPage() {
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     className="object-cover object-top transition-transform duration-300 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 flex items-end justify-end bg-gradient-to-t from-black/60 via-transparent to-transparent p-3 opacity-0 transition-opacity group-hover:opacity-100">
+                  <div className="absolute inset-0 flex items-end justify-end bg-linear-to-t from-black/60 via-transparent to-transparent p-3 opacity-0 transition-opacity group-hover:opacity-100">
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-space-950">
                       <ExternalLink className="h-3.5 w-3.5" />
                       View PDF
