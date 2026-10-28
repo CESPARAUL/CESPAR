@@ -20,13 +20,6 @@ export type Dataset = {
   format: string;
 };
 
-export type Bulletin = {
-  id: string;
-  title: string;
-  date: string;
-  pdf: string;
-};
-
 export type RequestStatus = "PENDING" | "APPROVED" | "REJECTED" | "FULFILLED";
 
 export type DataRequest = {

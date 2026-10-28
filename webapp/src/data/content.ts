@@ -594,3 +594,38 @@ export const donationInfo = {
     },
   ],
 };
+
+// Bulletins ship with the site (public/bulletins) instead of coming from the
+// backend's media folder, which Render's free disk wipes on every deploy. The
+// 154 MB magazine is too big for the site, so it's linked from a GitHub release.
+export type Bulletin = {
+  title: string;
+  date: string;
+  pdf: string;
+  cover: string;
+  size: string;
+};
+
+export const bulletins: Bulletin[] = [
+  {
+    title: "SCOSTEP/COURSE Newsletter vol. 48",
+    date: "16 July 2026",
+    pdf: "/bulletins/scostep-course-newsletter-vol48.pdf",
+    cover: "/bulletins/scostep-course-newsletter-vol48.jpg",
+    size: "7.9 MB",
+  },
+  {
+    title: "Magnetometer and Radio Antenna",
+    date: "13 December 2022",
+    pdf: "/bulletins/magnetometer-and-radio-antenna.pdf",
+    cover: "/bulletins/magnetometer-and-radio-antenna.jpg",
+    size: "0.3 MB",
+  },
+  {
+    title: "Our Journey to Space (CESPAR Magazine)",
+    date: "5 December 2022",
+    pdf: "https://github.com/CESPARAUL/CESPAR/releases/download/bulletins/CESPAR-Magazine-Our-Journey-to-Space.pdf",
+    cover: "/bulletins/cespar-magazine-our-journey-to-space.jpg",
+    size: "154 MB",
+  },
+];
