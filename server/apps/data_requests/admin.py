@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from apps.data_requests.models import DataRequest
-from apps.data_requests.utils import GENERIC_APPROVAL_MESSAGE, send_request_approved_email
+from apps.data_requests.utils import approval_note_for, send_request_approved_email
 
 
 @admin.register(DataRequest)
@@ -20,7 +20,7 @@ class DataRequestAdmin(admin.ModelAdmin):
         for data_request in pending:
             data_request.status = DataRequest.Status.APPROVED
             if not data_request.admin_note:
-                data_request.admin_note = GENERIC_APPROVAL_MESSAGE
+                data_request.admin_note = approval_note_for(data_request.dataset)
             data_request.save(update_fields=["status", "admin_note", "updated_at"])
             send_request_approved_email(data_request)
             count += 1

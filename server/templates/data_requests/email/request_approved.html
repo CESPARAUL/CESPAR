@@ -16,7 +16,16 @@
   </tr>
 </table>
 {% endif %}
+{% if access_url %}
+<p style="margin: 0 0 24px;">
+  <a href="{{ access_url }}" style="display:inline-block; background:#d81e2c; color:#ffffff; text-decoration:none; font-weight:700; font-size:14px; padding:12px 22px; border-radius:10px;">View &amp; download the data</a>
+</p>
+<p style="font-size: 13px; color: #8b90a3; margin: 0;">
+  Log in with this email address to see the charts and download full-resolution CSV files.
+</p>
+{% else %}
 <p style="font-size: 13px; color: #8b90a3; margin: 0;">
   Log in to your CESPAR dashboard to access the dataset.
 </p>
+{% endif %}
 {% endblock %}

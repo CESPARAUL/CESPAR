@@ -11,7 +11,7 @@ from apps.data_requests.serializers import (
     DataRequestSerializer,
     UpdateRequestStatusSerializer,
 )
-from apps.data_requests.utils import send_request_approved_email, send_request_submitted_email
+from apps.data_requests.utils import approval_note_for, send_request_approved_email, send_request_submitted_email
 
 
 class RequestListCreateView(APIView):
@@ -68,6 +68,9 @@ class RequestStatusUpdateView(APIView):
         serializer.save()
 
         if instance.status == DataRequest.Status.APPROVED and previous_status != DataRequest.Status.APPROVED:
+            if not instance.admin_note:
+                instance.admin_note = approval_note_for(instance.dataset)
+                instance.save(update_fields=["admin_note", "updated_at"])
             send_request_approved_email(instance)
 
         return Response({"request": DataRequestSerializer(instance).data})

@@ -34,10 +34,18 @@ export type DataRequest = {
   dataset: Pick<Dataset, "id" | "title" | "slug">;
 };
 
+export type MagnetometerDay = {
+  date: string; // station day (YYYY-MM-DD), 24h from 05:00 UTC
+  start: string;
+  end: string;
+  readings: number;
+};
+
 export type MagnetometerStatus = {
   latestReading: string | null;
   earliestReading: string | null;
   totalReadings: number;
+  days: MagnetometerDay[];
 };
 
 export type MagnetometerPoint = {
@@ -49,7 +57,10 @@ export type MagnetometerPoint = {
 };
 
 export type MagnetometerLatest = {
-  hours: number;
+  day: string | null;
+  start: string | null;
+  end: string | null;
+  hours: number | null;
   count: number;
   points: MagnetometerPoint[];
 };

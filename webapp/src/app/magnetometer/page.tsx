@@ -15,19 +15,19 @@ import type { Dataset, DataRequest, MagnetometerStatus, MagnetometerLatest } fro
 type Theme = "dark" | "light";
 const THEME_STORAGE_KEY = "cespar_mag_theme";
 
-// Standard quicklook windows used by geomagnetic-observatory dashboards
-// (INTERMAGNET, USGS Geomag) — a short live window plus common multi-day
-// spans for spotting storms/trends. Custom ranges are covered separately
-// by the CSV date picker below.
-const RANGE_OPTIONS = [
-  { label: "24h", hours: 24 },
-  { label: "3d", hours: 72 },
-  { label: "7d", hours: 168 },
-  { label: "30d", hours: 720 },
-];
-
 function isoDate(d: Date) {
   return d.toISOString().slice(0, 10);
+}
+
+// "1 Jun 2026" for a station day (YYYY-MM-DD), read as a calendar date.
+function dayLabel(date: string) {
+  return new Date(`${date}T12:00:00Z`).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+}
+
+function utcTime(iso: string) {
+  return new Date(iso).toLocaleString(undefined, {
+    day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "UTC",
+  }) + " UTC";
 }
 
 function timeAgo(iso: string) {
@@ -35,7 +35,7 @@ function timeAgo(iso: string) {
   if (seconds < 60) return "just now";
   if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
   if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-  return `${Math.floor(seconds / 86400)}d ago`;
+  return null; // older than a day: show the date instead
 }
 
 export default function MagnetometerPage() {
@@ -55,7 +55,9 @@ export default function MagnetometerPage() {
   const [checkingAccess, setCheckingAccess] = useState(true);
   const [status, setStatus] = useState<MagnetometerStatus | null>(null);
 
-  const [hours, setHours] = useState(24);
+  // Station day shown in the charts (null until the day list loads, then
+  // the most recent day on record).
+  const [day, setDay] = useState<string | null>(null);
   const [latest, setLatest] = useState<MagnetometerLatest | null>(null);
   const [loadingChart, setLoadingChart] = useState(false);
   const [chartError, setChartError] = useState<string | null>(null);
@@ -90,7 +92,15 @@ export default function MagnetometerPage() {
     if (!token) return;
     api
       .get<MagnetometerStatus>("/magnetometer/status", token)
-      .then(setStatus)
+      .then((res) => {
+        setStatus(res);
+        const newest = res.days?.[0];
+        if (newest) {
+          setDay((current) => current ?? newest.date);
+          setFromDate(isoDate(new Date(newest.start)));
+          setToDate(isoDate(new Date(newest.end)));
+        }
+      })
       .catch(() => {});
   }, [token]);
 
@@ -98,15 +108,15 @@ export default function MagnetometerPage() {
     user?.role === "ADMIN" || myRequest?.status === "APPROVED" || myRequest?.status === "FULFILLED";
 
   useEffect(() => {
-    if (!token || !hasAccess) return;
+    if (!token || !hasAccess || !day) return;
     setLoadingChart(true);
     setChartError(null);
     api
-      .get<MagnetometerLatest>(`/magnetometer/latest?hours=${hours}`, token)
+      .get<MagnetometerLatest>(`/magnetometer/latest?day=${day}`, token)
       .then(setLatest)
       .catch((err) => setChartError(err instanceof ApiError ? err.message : "Could not load chart data."))
       .finally(() => setLoadingChart(false));
-  }, [token, hasAccess, hours, retryCount]);
+  }, [token, hasAccess, day, retryCount]);
 
   const handleDownload = useCallback(async () => {
     if (!token) return;
@@ -173,19 +183,30 @@ export default function MagnetometerPage() {
             <StatusBar status={status} />
 
             <div className="flex flex-wrap items-center justify-between gap-4">
-              <h3 className="font-display text-lg font-bold text-[var(--mag-text-primary)]">Recent activity</h3>
-              <div className="inline-flex rounded-full border border-[var(--mag-panel-border)] bg-[var(--mag-card-bg)] p-1">
-                {RANGE_OPTIONS.map((opt) => (
+              <div>
+                <h3 className="font-display text-lg font-bold text-[var(--mag-text-primary)]">Station day</h3>
+                {latest?.start && latest?.end && (
+                  <p className="mt-0.5 text-xs text-[var(--mag-text-faint)]">
+                    {utcTime(latest.start)} – {utcTime(latest.end)}
+                  </p>
+                )}
+              </div>
+              <div className="inline-flex max-w-full flex-wrap gap-1 rounded-2xl border border-[var(--mag-panel-border)] bg-[var(--mag-card-bg)] p-1">
+                {(status?.days ?? []).map((d) => (
                   <button
-                    key={opt.hours}
-                    onClick={() => setHours(opt.hours)}
+                    key={d.date}
+                    onClick={() => {
+                      setDay(d.date);
+                      setFromDate(isoDate(new Date(d.start)));
+                      setToDate(isoDate(new Date(d.end)));
+                    }}
                     className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                      hours === opt.hours
+                      day === d.date
                         ? "bg-cespar-red text-white"
                         : "text-[var(--mag-text-secondary)] hover:text-[var(--mag-text-primary)]"
                     }`}
                   >
-                    {opt.label}
+                    {dayLabel(d.date)}
                   </button>
                 ))}
               </div>
@@ -238,7 +259,8 @@ export default function MagnetometerPage() {
                 <h3 className="font-display text-lg font-bold text-[var(--mag-text-primary)]">Download raw data</h3>
               </div>
               <p className="mt-1 text-sm text-[var(--mag-text-secondary)]">
-                Full-resolution CSV for a date range (max 90 days per request), timestamps in UTC.
+                Full-resolution CSV (about one reading every 8 seconds) for a date range, up to 90 days per
+                request, timestamps in UTC. The dates below are set to the station day shown above.
               </p>
 
               {downloadError && (
@@ -372,7 +394,7 @@ function StatusBar({ status }: { status: MagnetometerStatus | null }) {
       </div>
       <div className="flex items-center gap-1.5 text-sm text-[var(--mag-text-secondary)]">
         <Clock className="h-4 w-4 text-[var(--mag-text-faint)]" />
-        Last reading {timeAgo(status.latestReading)}
+        Latest reading {timeAgo(status.latestReading) ?? utcTime(status.latestReading)}
       </div>
       <div className="flex items-center gap-1.5 text-sm text-[var(--mag-text-secondary)]">
         <Gauge className="h-4 w-4 text-[var(--mag-text-faint)]" />

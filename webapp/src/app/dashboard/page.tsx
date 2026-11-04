@@ -12,6 +12,7 @@ import { useAuth } from "@/lib/auth-context";
 import { api } from "@/lib/api";
 import { getPendingRequest } from "@/lib/utils";
 import type { DataRequest, RequestStatus } from "@/types";
+import { AdminReview } from "@/components/dashboard/AdminReview";
 
 const statusConfig: Record<
   RequestStatus,
@@ -102,6 +103,8 @@ export default function DashboardPage() {
             </Button>
           </div>
         )}
+
+        {user.role === "ADMIN" && token && <AdminReview token={token} />}
 
         <div className="mt-10 flex items-center gap-1 rounded-full border border-white/15 bg-white/5 p-1 self-start">
           {(["active", "archived"] as const).map((tab) => (

@@ -7,7 +7,7 @@ from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.magnetometer.models import MagnetometerReading
+from apps.magnetometer.models import MagnetometerImport, MagnetometerReading
 from apps.magnetometer.permissions import HasApprovedMagnetometerAccess
 
 MAX_LATEST_HOURS = 24 * 30
@@ -38,28 +38,58 @@ def _despike_and_bin(readings, field_names=("x", "y", "z", "f")):
     return points
 
 
+def _station_days():
+    """Each ingested daily file = one station day (24h from 05:00 UTC,
+    the logger's midnight), newest first, with its UTC span."""
+    days = []
+    for imp in MagnetometerImport.objects.filter(row_count__gt=0).order_by("-file_date"):
+        span = imp.readings.order_by("timestamp")
+        first, last = span.first(), span.last()
+        if first and last:
+            days.append({"date": imp.file_date.isoformat(), "start": first.timestamp, "end": last.timestamp,
+                         "readings": imp.row_count, "import": imp})
+    return days
+
+
 class MagnetometerLatestView(APIView):
-    """GET /api/magnetometer/latest?hours=24 — despiked, 1-minute-averaged
-    readings for the live chart. Full-resolution data is only available
-    via the download endpoint."""
+    """GET /api/magnetometer/latest?day=YYYY-MM-DD — despiked,
+    1-minute-averaged readings for one station day (default: the most
+    recent day on record). ?hours=N instead gives the N hours up to the
+    latest reading (not up to now - the archive isn't streamed live, so
+    "the last 24h from now" is usually empty). Full-resolution data is
+    only available via the download endpoint."""
 
     permission_classes = [permissions.IsAuthenticated, HasApprovedMagnetometerAccess]
 
     def get(self, request):
-        try:
-            hours = int(request.query_params.get("hours", 24))
-        except ValueError:
-            return Response({"message": "hours must be an integer"}, status=400)
-        hours = max(1, min(hours, MAX_LATEST_HOURS))
-
-        since = dj_timezone.now() - timedelta(hours=hours)
-        readings = list(
-            MagnetometerReading.objects.filter(timestamp__gte=since).order_by("timestamp")
-        )
+        day = request.query_params.get("day")
+        hours = None
+        if day or "hours" not in request.query_params:
+            days = _station_days()
+            chosen = next((d for d in days if d["date"] == day), None) if day else (days[0] if days else None)
+            if day and not chosen:
+                return Response({"message": f"No magnetometer data for {day}"}, status=404)
+            readings = list(chosen["import"].readings.order_by("timestamp")) if chosen else []
+        else:
+            try:
+                hours = int(request.query_params.get("hours", 24))
+            except ValueError:
+                return Response({"message": "hours must be an integer"}, status=400)
+            hours = max(1, min(hours, MAX_LATEST_HOURS))
+            latest = MagnetometerReading.objects.order_by("-timestamp").first()
+            until = latest.timestamp if latest else dj_timezone.now()
+            readings = list(
+                MagnetometerReading.objects.filter(timestamp__gt=until - timedelta(hours=hours), timestamp__lte=until)
+                .order_by("timestamp")
+            )
+            chosen = None
         points = _despike_and_bin(readings)
 
         return Response({
+            "day": chosen["date"] if chosen else None,
             "hours": hours,
+            "start": points[0]["timestamp"].isoformat() if points else None,
+            "end": points[-1]["timestamp"].isoformat() if points else None,
             "count": len(points),
             "points": [
                 {
@@ -90,6 +120,9 @@ class MagnetometerStatusView(APIView):
             "latest_reading": latest.timestamp.isoformat() if latest else None,
             "earliest_reading": earliest.timestamp.isoformat() if earliest else None,
             "total_readings": MagnetometerReading.objects.count(),
+            # Station days on record, newest first - the chart's day picker.
+            "days": [{"date": d["date"], "start": d["start"].isoformat(), "end": d["end"].isoformat(),
+                      "readings": d["readings"]} for d in _station_days()],
         })
 
 
