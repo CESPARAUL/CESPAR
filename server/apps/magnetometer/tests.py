@@ -56,7 +56,10 @@ class MagnetometerRequestFlowTests(TestCase):
         self.assertEqual(res.status_code, 201, res.data)
         request_id = res.data["request"]["id"]
 
-        # Pending: the day list is visible, the field data isn't.
+        # Pending: the day list and a coarse preview are visible; full data isn't.
+        preview = client.get("/api/magnetometer/preview").data
+        self.assertEqual(preview["day"], "2026-03-03")
+        self.assertEqual(preview["count"], 1)  # both minutes fall in one 10-minute bin
         status = client.get("/api/magnetometer/status").data
         self.assertEqual([d["date"] for d in status["days"]], ["2026-03-03"])
         self.assertEqual(client.get("/api/magnetometer/latest").status_code, 403)
@@ -80,6 +83,9 @@ class MagnetometerRequestFlowTests(TestCase):
         self.assertEqual(csv.splitlines()[0], "timestamp_utc,x_nt,y_nt,z_nt,f_nt")
         self.assertEqual(len(csv.splitlines()), 4)
         self.assertEqual(client.get("/api/magnetometer/latest?day=2020-01-01").status_code, 404)
+
+    def test_no_preview_without_a_request(self):
+        self.assertEqual(self.as_user(self.researcher).get("/api/magnetometer/preview").status_code, 403)
 
     def test_hours_window_ends_at_the_latest_reading_not_now(self):
         data = self.as_user(self.admin).get("/api/magnetometer/latest?hours=24").data
@@ -107,3 +113,20 @@ class MagnetometerRequestFlowTests(TestCase):
         self.assertEqual(mail.outbox[0].to, ["ada@example.com"])
         web.post(url, {**data, "admin_note": req.admin_note})  # saving again doesn't re-send
         self.assertEqual(len(mail.outbox), 1)
+
+    def test_admin_upload_reads_the_date_and_loads_readings(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        from django.test import Client
+        self.admin.is_staff = self.admin.is_superuser = True
+        self.admin.save()
+        web = Client()
+        web.force_login(self.admin)
+        body = DAT.replace("2026 3 3", "2025 3 1").encode()
+        res = web.post("/admin/magnetometer/magnetometerimport/add/",
+                       {"file": SimpleUploadedFile("MagData_01_Mar_2025.dat", body), "file_date": ""})
+        self.assertEqual(res.status_code, 302)
+        imp = MagnetometerImport.objects.get(file_date=date(2025, 3, 1))
+        self.assertEqual(imp.row_count, 3)
+        res = web.post("/admin/magnetometer/magnetometerimport/add/",
+                       {"file": SimpleUploadedFile("MagData_01_Mar_2025.dat", body), "file_date": ""})
+        self.assertEqual(res.status_code, 200)  # same day twice is refused

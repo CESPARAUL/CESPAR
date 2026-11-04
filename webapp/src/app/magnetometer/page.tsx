@@ -196,7 +196,7 @@ export default function MagnetometerPage() {
         ) : !user ? (
           <SignInPrompt />
         ) : !hasAccess ? (
-          <AccessGate dataset={dataset} request={myRequest} status={status} />
+          <AccessGate dataset={dataset} request={myRequest} status={status} token={token} theme={theme} />
         ) : (
           <div className="mt-10 flex flex-col gap-8">
             <StatusBar status={status} />
@@ -449,11 +449,26 @@ function AccessGate({
   dataset,
   request,
   status,
+  token,
+  theme,
 }: {
   dataset: Dataset | null;
   request: DataRequest | null;
   status: MagnetometerStatus | null;
+  token: string | null;
+  theme: Theme;
 }) {
+  // While a request is pending: the latest station day at 10-minute
+  // resolution, so researchers can see what they're asking for.
+  const [preview, setPreview] = useState<MagnetometerLatest | null>(null);
+  useEffect(() => {
+    if (!token || request?.status !== "PENDING") return;
+    api
+      .get<MagnetometerLatest>("/magnetometer/preview", token)
+      .then(setPreview)
+      .catch(() => {});
+  }, [token, request?.status]);
+
   return (
     <div className="mt-10 flex flex-col gap-6">
       <StatusBar status={status} />
@@ -469,6 +484,17 @@ function AccessGate({
               live chart and download data here as soon as it&apos;s approved.
             </p>
           </>
+        )}
+        {request?.status === "PENDING" && preview && preview.points.length > 0 && (
+          <div className="mt-6">
+            <p className="label-mono mb-2 text-[11px] text-[var(--mag-text-faint)]">
+              Preview · {preview.day ? new Date(`${preview.day}T12:00:00Z`).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }) : ""} · 10-minute averages
+            </p>
+            <Magnetogram points={preview.points} theme={theme} />
+            <p className="mt-2 text-xs text-[var(--mag-text-faint)]">
+              Every station day, 1-minute detail and full-resolution CSV downloads unlock once your request is approved.
+            </p>
+          </div>
         )}
 
         {request?.status === "REJECTED" && (

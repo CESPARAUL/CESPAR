@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.magnetometer.models import MagnetometerImport, MagnetometerReading
-from apps.magnetometer.permissions import HasApprovedMagnetometerAccess
+from apps.magnetometer.permissions import HasApprovedMagnetometerAccess, HasRequestedMagnetometerAccess
 
 MAX_LATEST_HOURS = 24 * 30
 MAX_DOWNLOAD_DAYS = 90
@@ -101,6 +101,41 @@ class MagnetometerLatestView(APIView):
                 }
                 for p in points
             ],
+        })
+
+
+PREVIEW_BIN_MINUTES = 10
+
+
+class MagnetometerPreviewView(APIView):
+    """GET /api/magnetometer/preview — what a researcher sees while their
+    request is pending: the most recent station day, coarsened to
+    10-minute averages. Other days, full resolution and the CSV download
+    stay behind approval."""
+
+    permission_classes = [permissions.IsAuthenticated, HasRequestedMagnetometerAccess]
+
+    def get(self, request):
+        days = _station_days()
+        if not days:
+            return Response({"day": None, "start": None, "end": None, "count": 0, "points": [], "bin_minutes": PREVIEW_BIN_MINUTES})
+        minute_points = _despike_and_bin(list(days[0]["import"].readings.order_by("timestamp")))
+        bins = {}
+        for p in minute_points:
+            ts = p["timestamp"]
+            key = ts.replace(minute=ts.minute - ts.minute % PREVIEW_BIN_MINUTES)
+            bins.setdefault(key, []).append(p)
+        points = [
+            {"timestamp": key.isoformat(), **{f: round(sum(p[f] for p in group) / len(group), 1) for f in ("x", "y", "z", "f")}}
+            for key, group in sorted(bins.items())
+        ]
+        return Response({
+            "day": days[0]["date"],
+            "start": points[0]["timestamp"],
+            "end": points[-1]["timestamp"],
+            "count": len(points),
+            "points": points,
+            "bin_minutes": PREVIEW_BIN_MINUTES,
         })
 
 

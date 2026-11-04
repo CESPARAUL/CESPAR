@@ -28,3 +28,22 @@ class HasApprovedMagnetometerAccess(BasePermission):
             dataset__slug=MAGNETOMETER_DATASET_SLUG,
             status__in=[DataRequest.Status.APPROVED, DataRequest.Status.FULFILLED],
         ).exists()
+
+
+class HasRequestedMagnetometerAccess(BasePermission):
+    """For the preview: anyone who has asked for Magnetometer Data (pending
+    or approved), and admins. Rejected requests don't get a preview."""
+
+    message = "Request access to Magnetometer Data to see a preview."
+
+    def has_permission(self, request, view):
+        user = request.user
+        if not (user and user.is_authenticated):
+            return False
+        if user.role == User.Role.ADMIN:
+            return True
+        return DataRequest.objects.filter(
+            user=user,
+            dataset__slug=MAGNETOMETER_DATASET_SLUG,
+            status__in=[DataRequest.Status.PENDING, DataRequest.Status.APPROVED, DataRequest.Status.FULFILLED],
+        ).exists()

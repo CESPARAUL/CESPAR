@@ -1,3 +1,6 @@
+import os
+
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from apps.accounts.models import User
@@ -46,7 +49,7 @@ DATASETS = [
             "geomagnetic and space weather research."
         ),
         "coverage": "Anchor University Lagos station, 2022 - present",
-        "format": "CSV / IAGA-2002",
+        "format": "CSV (UTC timestamps, nT)",
     },
     {
         "slug": "data-archive",
@@ -73,29 +76,42 @@ class Command(BaseCommand):
             action = "Created" if created else "Updated"
             self.stdout.write(f"{action} dataset: {dataset.title}")
 
-        admin_email = "admin@cespar.space"
-        admin, created = User.objects.get_or_create(
-            email=admin_email,
-            defaults={
-                "name": "CESPAR Admin",
-                "institution": "Anchor University Lagos",
-                "role": User.Role.ADMIN,
-                "email_verified": True,
-                "is_staff": True,
-                "is_superuser": True,
-            },
-        )
-        if created:
-            admin.set_password("ChangeMe123!")
-            admin.save()
-            self.stdout.write(
-                self.style.SUCCESS(
-                    f"Seeded admin account: {admin_email} / ChangeMe123! (change this password)"
-                )
-            )
-        elif not admin.email_verified:
-            admin.email_verified = True
-            admin.save(update_fields=["email_verified"])
-            self.stdout.write(f"Marked existing admin account ({admin_email}) as verified.")
+        self.seed_admins()
 
         self.stdout.write(self.style.SUCCESS(f"Seeded {len(DATASETS)} datasets."))
+
+    def seed_admins(self):
+        """Admin accounts. Locally: admin@cespar.space with a throwaway
+        password for development. On the live server (Render, or DEBUG
+        off): no usable password - each admin sets their own with Forgot
+        password on the website, so no known password ever exists there."""
+        on_server = bool(os.environ.get("RENDER")) or not settings.DEBUG
+        emails = ["admin@cespar.space", *[
+            e.strip().lower() for e in os.environ.get("SEED_ADMIN_EMAILS", "aulspacecenter@gmail.com").split(",") if e.strip()
+        ]]
+        for email in dict.fromkeys(emails):
+            admin, created = User.objects.get_or_create(
+                email=email,
+                defaults={
+                    "name": "CESPAR Admin",
+                    "institution": "Anchor University Lagos",
+                    "role": User.Role.ADMIN,
+                    "email_verified": True,
+                    "is_staff": True,
+                    "is_superuser": True,
+                },
+            )
+            if created:
+                if on_server:
+                    admin.set_unusable_password()
+                    note = "set a password with Forgot password on the website"
+                else:
+                    admin.set_password("ChangeMe123!")
+                    note = "local password ChangeMe123!"
+                admin.save()
+                self.stdout.write(self.style.SUCCESS(f"Seeded admin account: {email} ({note})"))
+            elif not admin.email_verified or admin.role != User.Role.ADMIN:
+                admin.email_verified = True
+                admin.role = User.Role.ADMIN
+                admin.save(update_fields=["email_verified", "role"])
+                self.stdout.write(f"Made sure {email} is a verified admin.")
