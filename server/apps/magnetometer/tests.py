@@ -84,3 +84,26 @@ class MagnetometerRequestFlowTests(TestCase):
     def test_hours_window_ends_at_the_latest_reading_not_now(self):
         data = self.as_user(self.admin).get("/api/magnetometer/latest?hours=24").data
         self.assertEqual(data["count"], 2)
+
+    def test_approving_on_the_django_admin_change_page_emails_the_requester(self):
+        req = DataRequest.objects.create(user=self.researcher, dataset=self.dataset, purpose="Storm study for my thesis.")
+        self.admin.is_staff = self.admin.is_superuser = True
+        self.admin.save()
+        from django.test import Client
+        web = Client()
+        web.force_login(self.admin)
+        mail.outbox.clear()
+        url = f"/admin/data_requests/datarequest/{req.pk}/change/"
+        page = web.get(url)
+        self.assertEqual(page.status_code, 200)
+        form = page.context["adminform"].form
+        data = {k: (v.pk if hasattr(v, "pk") else v) for k, v in form.initial.items() if v is not None}
+        data.update({"status": "APPROVED", "purpose": req.purpose, "user": str(req.user_id), "dataset": str(req.dataset_id)})
+        res = web.post(url, data)
+        self.assertEqual(res.status_code, 302, res.content[:600])
+        req.refresh_from_db()
+        self.assertEqual(req.status, "APPROVED")
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ["ada@example.com"])
+        web.post(url, {**data, "admin_note": req.admin_note})  # saving again doesn't re-send
+        self.assertEqual(len(mail.outbox), 1)

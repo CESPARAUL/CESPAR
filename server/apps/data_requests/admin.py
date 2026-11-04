@@ -13,6 +13,20 @@ class DataRequestAdmin(admin.ModelAdmin):
     autocomplete_fields = ["user", "dataset"]
     actions = ["approve_requests"]
 
+    def save_model(self, request, obj, form, change):
+        # Changing Status to Approved on the request's own page emails the
+        # requester too, same as the list action and the website button.
+        newly_approved = (
+            obj.status == DataRequest.Status.APPROVED
+            and (not change or form.initial.get("status") != DataRequest.Status.APPROVED)
+        )
+        if newly_approved and not obj.admin_note:
+            obj.admin_note = approval_note_for(obj.dataset)
+        super().save_model(request, obj, form, change)
+        if newly_approved:
+            send_request_approved_email(obj)
+            self.message_user(request, f"Approval email sent to {obj.user.email}.")
+
     @admin.action(description="Approve selected requests")
     def approve_requests(self, request, queryset):
         pending = queryset.exclude(status=DataRequest.Status.APPROVED).select_related("user", "dataset")
