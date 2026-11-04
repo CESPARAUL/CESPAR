@@ -2,11 +2,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Check, Clock, Download, Gauge, Hourglass, Loader2, Moon, Sun, XCircle } from "lucide-react";
+import { Check, Clock, Download, Gauge, Hourglass, LayoutGrid, Loader2, Moon, Rows3, Sun, XCircle } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { inputClasses, FormField } from "@/components/ui/FormField";
 import { StarField } from "@/components/ui/StarField";
+import { Magnetogram } from "@/components/magnetometer/Magnetogram";
 import { FieldChart } from "@/components/magnetometer/FieldChart";
 import { useAuth } from "@/lib/auth-context";
 import { api, ApiError, API_BASE_URL } from "@/lib/api";
@@ -14,6 +15,10 @@ import type { Dataset, DataRequest, MagnetometerStatus, MagnetometerLatest } fro
 
 type Theme = "dark" | "light";
 const THEME_STORAGE_KEY = "cespar_mag_theme";
+// Stacked = observatory-style magnetogram (shared time axis); grid = one
+// card per component. The viewer's last choice is remembered.
+type ChartView = "stacked" | "grid";
+const VIEW_STORAGE_KEY = "cespar_mag_view";
 
 function isoDate(d: Date) {
   return d.toISOString().slice(0, 10);
@@ -49,6 +54,20 @@ export default function MagnetometerPage() {
   useEffect(() => {
     window.localStorage.setItem(THEME_STORAGE_KEY, theme);
   }, [theme]);
+
+  const [view, setView] = useState<ChartView>("stacked");
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(VIEW_STORAGE_KEY);
+      if (stored === "stacked" || stored === "grid") setView(stored);
+    } catch {}
+  }, []);
+  const chooseView = (next: ChartView) => {
+    setView(next);
+    try {
+      window.localStorage.setItem(VIEW_STORAGE_KEY, next);
+    } catch {}
+  };
 
   const [dataset, setDataset] = useState<Dataset | null>(null);
   const [myRequest, setMyRequest] = useState<DataRequest | null>(null);
@@ -223,30 +242,41 @@ export default function MagnetometerPage() {
                 </button>
               </div>
             ) : loadingChart ? (
-              <div className="grid gap-5 lg:grid-cols-2">
-                {["Total Field (F)", "X component", "Y component", "Z component"].map((label) => (
-                  <ChartSkeleton key={label} label={label} />
-                ))}
-              </div>
+              <ChartSkeleton label="Magnetogram" />
             ) : (
-              <div className="grid gap-5 lg:grid-cols-2">
-                <FieldChart points={latest?.points ?? []} field="f" label="Total Field (F)" color="var(--color-cespar-red)" theme={theme} />
-                <FieldChart points={latest?.points ?? []} field="x" label="X component" color="var(--color-navy-400)" theme={theme} />
-                <FieldChart
-                  points={latest?.points ?? []}
-                  field="y"
-                  label="Y component"
-                  color={theme === "dark" ? "#6ee7b7" : "#0d9488"}
-                  theme={theme}
-                />
-                <FieldChart
-                  points={latest?.points ?? []}
-                  field="z"
-                  label="Z component"
-                  color={theme === "dark" ? "#facc15" : "#b45309"}
-                  theme={theme}
-                />
-              </div>
+              <>
+                <div className="-mb-3 flex justify-end">
+                  <div className="inline-flex rounded-full border border-[var(--mag-panel-border)] bg-[var(--mag-card-bg)] p-1" role="tablist" aria-label="Chart layout">
+                    {([
+                      ["stacked", "Stacked", Rows3],
+                      ["grid", "Grid", LayoutGrid],
+                    ] as const).map(([key, label, Icon]) => (
+                      <button
+                        key={key}
+                        role="tab"
+                        aria-selected={view === key}
+                        onClick={() => chooseView(key)}
+                        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                          view === key ? "bg-cespar-red text-white" : "text-[var(--mag-text-secondary)] hover:text-[var(--mag-text-primary)]"
+                        }`}
+                      >
+                        <Icon className="h-3.5 w-3.5" />
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {view === "stacked" ? (
+                  <Magnetogram points={latest?.points ?? []} theme={theme} />
+                ) : (
+                  <div className="grid gap-5 lg:grid-cols-2">
+                    <FieldChart points={latest?.points ?? []} field="f" label="Total Field (F)" color="var(--color-cespar-red)" theme={theme} />
+                    <FieldChart points={latest?.points ?? []} field="x" label="X component" color="var(--color-navy-400)" theme={theme} />
+                    <FieldChart points={latest?.points ?? []} field="y" label="Y component" color={theme === "dark" ? "#6ee7b7" : "#0d9488"} theme={theme} />
+                    <FieldChart points={latest?.points ?? []} field="z" label="Z component" color={theme === "dark" ? "#facc15" : "#b45309"} theme={theme} />
+                  </div>
+                )}
+              </>
             )}
             <p className="text-xs text-[var(--mag-text-faint)]">
               1-minute averages, outliers rejected within each minute. Full-resolution raw samples are included in
@@ -360,7 +390,7 @@ function ChartSkeleton({ label }: { label: string }) {
         <span className="label-mono text-[11px] text-[var(--mag-text-faint)]">{label}</span>
         <Loader2 className="h-3.5 w-3.5 animate-spin text-[var(--mag-text-faint)]" />
       </div>
-      <div className="mt-2 h-[180px] animate-pulse rounded-lg bg-[var(--mag-skeleton-bg)]" />
+      <div className="mt-2 h-[360px] animate-pulse rounded-lg bg-[var(--mag-skeleton-bg)]" />
     </div>
   );
 }
