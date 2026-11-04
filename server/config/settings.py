@@ -3,6 +3,7 @@ Django settings for the CESPAR backend.
 """
 
 from datetime import timedelta
+import os
 from pathlib import Path
 
 import environ
@@ -202,7 +203,13 @@ EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="CESPAR <no-reply@cespar.space>")
 
-FRONTEND_BASE_URL = env("FRONTEND_BASE_URL", default="http://localhost:3000")
+LIVE_FRONTEND_URL = "https://www.cespar.space"
+_ON_SERVER = bool(os.environ.get("RENDER")) or not DEBUG
+FRONTEND_BASE_URL = env("FRONTEND_BASE_URL", default=LIVE_FRONTEND_URL if _ON_SERVER else "http://localhost:3000").rstrip("/")
+# Links in emails sent from the live server must never point at a
+# developer's machine, even if the env var was copied from a local .env.
+if _ON_SERVER and ("localhost" in FRONTEND_BASE_URL or "127.0.0.1" in FRONTEND_BASE_URL):
+    FRONTEND_BASE_URL = LIVE_FRONTEND_URL
 
 # ------------------------------------------------------------------
 # Logging
