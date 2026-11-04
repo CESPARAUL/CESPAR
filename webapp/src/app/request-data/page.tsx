@@ -246,6 +246,17 @@ function RequestDataContent() {
                           onChange={(e) => setDateRangeTo(e.target.value)}
                           className={inputClasses}
                         />
+                        {/* One tap for "up to now": today's date in the user's own timezone. */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const now = new Date();
+                            setDateRangeTo(new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10));
+                          }}
+                          className="mt-2 self-start rounded-full border border-white/25 px-3 py-1 text-xs font-medium text-white/80 transition-colors hover:border-cespar-red hover:text-white"
+                        >
+                          Today
+                        </button>
                       </FormField>
                     </div>
 
