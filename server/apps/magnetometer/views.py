@@ -12,6 +12,7 @@ from apps.magnetometer.permissions import HasApprovedMagnetometerAccess, HasRequ
 
 MAX_LATEST_HOURS = 24 * 30
 MAX_DOWNLOAD_DAYS = 90
+RESOLUTION_MINUTES = {"minute": 1, "hour": 60, "day": 24 * 60}
 
 
 def _despike_and_bin(readings, field_names=("x", "y", "z", "f")):
@@ -36,6 +37,23 @@ def _despike_and_bin(readings, field_names=("x", "y", "z", "f")):
             point[field] = sum(kept) / len(kept)
         points.append(point)
     return points
+
+
+def _aggregate_points(points, minutes):
+    """Average already-despiked minute points into UTC-aligned windows."""
+    if minutes == 1:
+        return points
+    buckets = {}
+    for point in points:
+        timestamp = point["timestamp"]
+        key = timestamp.replace(minute=timestamp.minute - timestamp.minute % minutes, second=0, microsecond=0)
+        if minutes == 24 * 60:
+            key = key.replace(hour=0, minute=0)
+        buckets.setdefault(key, []).append(point)
+    return [
+        {"timestamp": key, **{field: sum(p[field] for p in group) / len(group) for field in ("x", "y", "z", "f")}}
+        for key, group in sorted(buckets.items())
+    ]
 
 
 def _station_days():
@@ -63,8 +81,25 @@ class MagnetometerLatestView(APIView):
 
     def get(self, request):
         day = request.query_params.get("day")
+        from_str, to_str = request.query_params.get("from"), request.query_params.get("to")
+        resolution = request.query_params.get("resolution", "minute")
+        if resolution not in RESOLUTION_MINUTES:
+            return Response({"message": "resolution must be minute, hour or day"}, status=400)
         hours = None
-        if day or "hours" not in request.query_params:
+        if from_str or to_str:
+            if not from_str or not to_str:
+                return Response({"message": "'from' and 'to' must be used together"}, status=400)
+            try:
+                start, end = date.fromisoformat(from_str), date.fromisoformat(to_str)
+            except ValueError:
+                return Response({"message": "'from' and 'to' must be YYYY-MM-DD"}, status=400)
+            if end < start or (end - start).days > MAX_DOWNLOAD_DAYS:
+                return Response({"message": f"range must be ordered and no more than {MAX_DOWNLOAD_DAYS} days"}, status=400)
+            start_dt = datetime.combine(start, datetime.min.time(), tzinfo=timezone.utc)
+            end_dt = datetime.combine(end, datetime.max.time(), tzinfo=timezone.utc)
+            readings = list(MagnetometerReading.objects.filter(timestamp__gte=start_dt, timestamp__lte=end_dt).order_by("timestamp"))
+            chosen = None
+        elif day or "hours" not in request.query_params:
             days = _station_days()
             chosen = next((d for d in days if d["date"] == day), None) if day else (days[0] if days else None)
             if day and not chosen:
@@ -83,11 +118,12 @@ class MagnetometerLatestView(APIView):
                 .order_by("timestamp")
             )
             chosen = None
-        points = _despike_and_bin(readings)
+        points = _aggregate_points(_despike_and_bin(readings), RESOLUTION_MINUTES[resolution])
 
         return Response({
             "day": chosen["date"] if chosen else None,
             "hours": hours,
+            "resolution": resolution,
             "start": points[0]["timestamp"].isoformat() if points else None,
             "end": points[-1]["timestamp"].isoformat() if points else None,
             "count": len(points),

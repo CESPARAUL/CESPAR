@@ -131,6 +131,37 @@ body {
   text-transform: uppercase;
 }
 
+/* Hero full-name band: translucent text drawn through a wide gradient, so a
+   bright sheen can pass across it. It settles in once (blur + tracking),
+   then HeroNameBand re-triggers the sweep at random intervals. */
+.name-band-text {
+  letter-spacing: 0.12em;
+  background-image: linear-gradient(
+    105deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.3) 42%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(255, 255, 255, 0.3) 58%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  background-size: 300% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: name-band-in 1.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.name-band-sweep {
+  animation: name-band-sweep 2.2s cubic-bezier(0.45, 0, 0.2, 1) both;
+}
+@keyframes name-band-in {
+  from { opacity: 0; filter: blur(10px); letter-spacing: 0.45em; }
+  to { opacity: 1; filter: blur(0); letter-spacing: 0.12em; }
+}
+@keyframes name-band-sweep {
+  from { background-position: 100% 0; }
+  to { background-position: 0% 0; }
+}
+
 @keyframes scan-x {
   0%, 100% { transform: translateX(0); }
   50% { transform: translateX(6px); }
@@ -211,6 +242,8 @@ body {
   .live-badge,
   .live-dot,
   .animate-hero-drift,
+  .name-band-text,
+  .name-band-sweep,
   [style*="ring-spin"],
   [style*="scan-x"],
   [style*="flow-arrow"] {

@@ -91,6 +91,17 @@ class MagnetometerRequestFlowTests(TestCase):
         data = self.as_user(self.admin).get("/api/magnetometer/latest?hours=24").data
         self.assertEqual(data["count"], 2)
 
+    def test_approved_user_can_preview_a_range_at_each_resolution(self):
+        client = self.as_user(self.admin)
+        minute = client.get("/api/magnetometer/latest?from=2026-03-03&to=2026-03-03&resolution=minute")
+        hour = client.get("/api/magnetometer/latest?from=2026-03-03&to=2026-03-03&resolution=hour")
+        day = client.get("/api/magnetometer/latest?from=2026-03-03&to=2026-03-03&resolution=day")
+        self.assertEqual(minute.status_code, 200)
+        self.assertEqual(minute.data["count"], 2)
+        self.assertEqual(hour.data["count"], 1)
+        self.assertEqual(day.data["count"], 1)
+        self.assertEqual(day.data["resolution"], "day")
+
     def test_approving_on_the_django_admin_change_page_emails_the_requester(self):
         req = DataRequest.objects.create(user=self.researcher, dataset=self.dataset, purpose="Storm study for my thesis.")
         self.admin.is_staff = self.admin.is_superuser = True

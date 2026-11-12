@@ -61,6 +61,7 @@ export type MagnetometerLatest = {
   start: string | null;
   end: string | null;
   hours: number | null;
+  resolution?: "minute" | "hour" | "day";
   count: number;
   points: MagnetometerPoint[];
 };

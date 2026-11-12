@@ -35,6 +35,9 @@ export const primaryNav = [
 ];
 
 export const heroContent = {
+  // The full name, shown in a band at the top of the hero.
+  fullName: "Centre for Space Research",
+  institution: "Anchor University Lagos",
   badge: "Live Space Weather Monitoring",
   headlineStart: "We study and collect",
   headlineAccent: "space data",

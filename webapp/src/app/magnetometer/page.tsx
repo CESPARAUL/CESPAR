@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Check, Clock, Download, Gauge, Hourglass, LayoutGrid, Loader2, Moon, Rows3, Sun, XCircle } from "lucide-react";
+import { CalendarDays, Check, Clock, Download, Gauge, Hourglass, LayoutGrid, Loader2, Moon, Rows3, Sun, XCircle } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { inputClasses, FormField } from "@/components/ui/FormField";
@@ -18,6 +18,7 @@ const THEME_STORAGE_KEY = "cespar_mag_theme";
 // Stacked = observatory-style magnetogram (shared time axis); grid = one
 // card per component. The viewer's last choice is remembered.
 type ChartView = "stacked" | "grid";
+type Resolution = "minute" | "hour" | "day";
 const VIEW_STORAGE_KEY = "cespar_mag_view";
 
 function isoDate(d: Date) {
@@ -81,6 +82,10 @@ export default function MagnetometerPage() {
   const [loadingChart, setLoadingChart] = useState(false);
   const [chartError, setChartError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+  const [resolution, setResolution] = useState<Resolution>("minute");
+  const [rangePreview, setRangePreview] = useState<MagnetometerLatest | null>(null);
+  const [previewingRange, setPreviewingRange] = useState(false);
+  const [rangeError, setRangeError] = useState<string | null>(null);
 
   const [fromDate, setFromDate] = useState(() => isoDate(new Date(Date.now() - 7 * 86400_000)));
   const [toDate, setToDate] = useState(() => isoDate(new Date()));
@@ -131,11 +136,32 @@ export default function MagnetometerPage() {
     setLoadingChart(true);
     setChartError(null);
     api
-      .get<MagnetometerLatest>(`/magnetometer/latest?day=${day}`, token)
+      .get<MagnetometerLatest>(`/magnetometer/latest?day=${day}&resolution=${resolution}`, token)
       .then(setLatest)
       .catch((err) => setChartError(err instanceof ApiError ? err.message : "Could not load chart data."))
       .finally(() => setLoadingChart(false));
-  }, [token, hasAccess, day, retryCount]);
+  }, [token, hasAccess, day, resolution, retryCount]);
+
+  const previewRange = useCallback(async () => {
+    if (!token || !fromDate || !toDate) return;
+    setPreviewingRange(true);
+    setRangeError(null);
+    try {
+      const result = await api.get<MagnetometerLatest>(
+        `/magnetometer/latest?from=${fromDate}&to=${toDate}&resolution=${resolution}`,
+        token,
+      );
+      setRangePreview(result);
+    } catch (err) {
+      setRangePreview(null);
+      setRangeError(err instanceof ApiError ? err.message : "Could not preview this range.");
+    } finally {
+      setPreviewingRange(false);
+    }
+  }, [token, fromDate, toDate, resolution]);
+
+  const chartData = rangePreview ?? latest;
+  const stamps = useMemo(() => (chartData?.points ?? []).slice(-12).reverse(), [chartData]);
 
   const handleDownload = useCallback(async () => {
     if (!token) return;
@@ -204,9 +230,9 @@ export default function MagnetometerPage() {
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
                 <h3 className="font-display text-lg font-bold text-[var(--mag-text-primary)]">Station day</h3>
-                {latest?.start && latest?.end && (
+                {chartData?.start && chartData?.end && (
                   <p className="mt-0.5 text-xs text-[var(--mag-text-faint)]">
-                    {utcTime(latest.start)} – {utcTime(latest.end)}
+                    {rangePreview ? "Range preview · " : ""}{utcTime(chartData.start)} – {utcTime(chartData.end)}
                   </p>
                 )}
               </div>
@@ -216,6 +242,7 @@ export default function MagnetometerPage() {
                     key={d.date}
                     onClick={() => {
                       setDay(d.date);
+                      setRangePreview(null);
                       setFromDate(isoDate(new Date(d.start)));
                       setToDate(isoDate(new Date(d.end)));
                     }}
@@ -245,7 +272,25 @@ export default function MagnetometerPage() {
               <ChartSkeleton label="Magnetogram" />
             ) : (
               <>
-                <div className="-mb-3 flex justify-end">
+                <div className="-mb-3 flex flex-wrap justify-end gap-2">
+                  <div className="inline-flex rounded-full border border-[var(--mag-panel-border)] bg-[var(--mag-card-bg)] p-1" role="tablist" aria-label="Time resolution">
+                    {(["minute", "hour", "day"] as const).map((value) => (
+                      <button
+                        key={value}
+                        role="tab"
+                        aria-selected={resolution === value}
+                        onClick={() => {
+                          setResolution(value);
+                          setRangePreview(null);
+                        }}
+                        className={`rounded-full px-3 py-1.5 text-xs font-medium capitalize transition-colors ${
+                          resolution === value ? "bg-cespar-red text-white" : "text-[var(--mag-text-secondary)] hover:text-[var(--mag-text-primary)]"
+                        }`}
+                      >
+                        {value}
+                      </button>
+                    ))}
+                  </div>
                   <div className="inline-flex rounded-full border border-[var(--mag-panel-border)] bg-[var(--mag-card-bg)] p-1" role="tablist" aria-label="Chart layout">
                     {([
                       ["stacked", "Stacked", Rows3],
@@ -267,20 +312,20 @@ export default function MagnetometerPage() {
                   </div>
                 </div>
                 {view === "stacked" ? (
-                  <Magnetogram points={latest?.points ?? []} theme={theme} />
+                  <Magnetogram points={chartData?.points ?? []} theme={theme} />
                 ) : (
                   <div className="grid gap-5 lg:grid-cols-2">
-                    <FieldChart points={latest?.points ?? []} field="f" label="Total Field (F)" color="var(--color-cespar-red)" theme={theme} />
-                    <FieldChart points={latest?.points ?? []} field="x" label="X component" color="var(--color-navy-400)" theme={theme} />
-                    <FieldChart points={latest?.points ?? []} field="y" label="Y component" color={theme === "dark" ? "#6ee7b7" : "#0d9488"} theme={theme} />
-                    <FieldChart points={latest?.points ?? []} field="z" label="Z component" color={theme === "dark" ? "#facc15" : "#b45309"} theme={theme} />
+                    <FieldChart points={chartData?.points ?? []} field="f" label="Total Field (F)" color="var(--color-cespar-red)" theme={theme} />
+                    <FieldChart points={chartData?.points ?? []} field="x" label="X component" color="var(--color-navy-400)" theme={theme} />
+                    <FieldChart points={chartData?.points ?? []} field="y" label="Y component" color={theme === "dark" ? "#6ee7b7" : "#0d9488"} theme={theme} />
+                    <FieldChart points={chartData?.points ?? []} field="z" label="Z component" color={theme === "dark" ? "#facc15" : "#b45309"} theme={theme} />
                   </div>
                 )}
               </>
             )}
             <p className="text-xs text-[var(--mag-text-faint)]">
-              1-minute averages, outliers rejected within each minute. Full-resolution raw samples are included in
-              the CSV download below.
+              Showing {resolution} averages in UTC. Outliers are rejected within each minute before aggregation;
+              full-resolution raw samples are included in the CSV download below.
             </p>
 
             <div className="rounded-2xl border border-[var(--mag-panel-border)] bg-[var(--mag-panel-bg)] p-6">
@@ -318,12 +363,45 @@ export default function MagnetometerPage() {
                     className={inputClasses}
                   />
                 </FormField>
+                <Button onClick={previewRange} variant="outline" disabled={previewingRange}>
+                  <CalendarDays className="h-4 w-4" />
+                  {previewingRange ? "Loading preview…" : "Preview range"}
+                </Button>
                 <Button onClick={handleDownload} disabled={downloading}>
                   <Download className="h-4 w-4" />
                   {downloading ? "Preparing…" : "Download CSV"}
                 </Button>
               </div>
+              {rangeError && <p className="mt-4 text-sm text-cespar-red-light">{rangeError}</p>}
+              {rangePreview && (
+                <div className="mt-4 flex items-center justify-between gap-3 rounded-lg border border-[var(--mag-card-border)] bg-[var(--mag-card-bg)] px-3.5 py-2.5 text-sm text-[var(--mag-text-secondary)]">
+                  <span>{rangePreview.count.toLocaleString()} {resolution} data points are now shown above.</span>
+                  <button onClick={() => setRangePreview(null)} className="shrink-0 font-medium text-cespar-red-light hover:underline">Clear preview</button>
+                </div>
+              )}
             </div>
+
+            {stamps.length > 0 && (
+              <div className="rounded-2xl border border-[var(--mag-panel-border)] bg-[var(--mag-panel-bg)] p-6">
+                <h3 className="font-display text-lg font-bold text-[var(--mag-text-primary)]">Data stamps</h3>
+                <p className="mt-1 text-sm text-[var(--mag-text-secondary)]">Most recent timestamps in the chart currently on screen (UTC).</p>
+                <div className="mt-4 overflow-x-auto">
+                  <table className="w-full min-w-[520px] text-left text-sm">
+                    <thead className="border-b border-[var(--mag-card-border)] text-xs text-[var(--mag-text-faint)]">
+                      <tr><th className="pb-2 font-medium">Timestamp</th><th className="pb-2 font-medium">X</th><th className="pb-2 font-medium">Y</th><th className="pb-2 font-medium">Z</th><th className="pb-2 font-medium">F</th></tr>
+                    </thead>
+                    <tbody className="text-[var(--mag-text-secondary)]">
+                      {stamps.map((point) => (
+                        <tr key={point.timestamp} className="border-b border-[var(--mag-card-border)] last:border-0">
+                          <td className="py-2.5 whitespace-nowrap">{utcTime(point.timestamp)}</td>
+                          <td className="py-2.5">{point.x.toFixed(1)}</td><td className="py-2.5">{point.y.toFixed(1)}</td><td className="py-2.5">{point.z.toFixed(1)}</td><td className="py-2.5">{point.f.toFixed(1)} nT</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </Container>

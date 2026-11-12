@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { StarField } from "@/components/ui/StarField";
 import { HeroSatelliteMonitor } from "@/components/home/HeroSatelliteMonitor";
 import { HeroEarth } from "@/components/home/HeroEarth";
+import { HeroNameBand } from "@/components/home/HeroNameBand";
 import { heroContent, capabilities } from "@/data/content";
 
 const stats = [
@@ -47,6 +48,8 @@ export function Hero() {
       <HeroEarth />
 
       <div className="pointer-events-none absolute inset-0 bg-grid-space opacity-10 [mask-image:radial-gradient(ellipse_70%_60%_at_30%_0%,black,transparent)]" />
+
+      <HeroNameBand />
 
       <Container className="relative py-16 sm:py-20 lg:py-28">
         <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-10">
