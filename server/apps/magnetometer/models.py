@@ -17,6 +17,9 @@ class MagnetometerImport(UUIDModel, TimeStampedModel):
     row_count = models.PositiveIntegerField(default=0)
     skipped_row_count = models.PositiveIntegerField(default=0)
     parsed_at = models.DateTimeField(null=True, blank=True)
+    # Size of the copy last loaded. The station re-sends today's file as
+    # it grows; a copy that isn't bigger than this one is a duplicate.
+    source_bytes = models.PositiveBigIntegerField(default=0)
 
     class Meta:
         ordering = ["-file_date"]

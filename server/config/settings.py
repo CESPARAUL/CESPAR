@@ -189,6 +189,11 @@ CORS_ALLOW_CREDENTIALS = True
 # for environments without it (e.g. local dev), and falls back further to
 # printing to the console (and to the server log) when unset entirely.
 # ------------------------------------------------------------------
+# Shared secret the station's Raspberry Pi sends (X-Station-Token) when it
+# pushes MagData_*.dat files to /api/magnetometer/station/upload. Empty =
+# station uploads switched off.
+STATION_UPLOAD_TOKEN = env("STATION_UPLOAD_TOKEN", default="")
+
 RESEND_API_KEY = env("RESEND_API_KEY", default="")
 _default_email_backend = (
     "django.core.mail.backends.smtp.EmailBackend"

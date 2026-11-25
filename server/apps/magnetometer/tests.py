@@ -141,3 +141,48 @@ class MagnetometerRequestFlowTests(TestCase):
         res = web.post("/admin/magnetometer/magnetometerimport/add/",
                        {"file": SimpleUploadedFile("MagData_01_Mar_2025.dat", body), "file_date": ""})
         self.assertEqual(res.status_code, 200)  # same day twice is refused
+
+
+@override_settings(STATION_UPLOAD_TOKEN="pi-secret", MEDIA_ROOT=tempfile.mkdtemp())
+class StationUploadTests(TestCase):
+    """The station Pi pushes its daily files; growing files top up, and
+    the same copy twice changes nothing."""
+
+    URL = "/api/magnetometer/station/upload"
+
+    def send(self, body, name="MagData_03_Mar_2026.dat", token="pi-secret"):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        client = APIClient()
+        headers = {"HTTP_X_STATION_TOKEN": token} if token else {}
+        return client.post(self.URL, {"file": SimpleUploadedFile(name, body.encode())}, format="multipart", **headers)
+
+    def test_wrong_or_missing_token_is_refused(self):
+        self.assertEqual(self.send(DAT, token="nope").status_code, 403)
+        self.assertEqual(self.send(DAT, token=None).status_code, 403)
+        self.assertFalse(MagnetometerImport.objects.exists())
+
+    @override_settings(STATION_UPLOAD_TOKEN="")
+    def test_switched_off_without_a_token_configured(self):
+        self.assertEqual(self.send(DAT, token="").status_code, 403)
+
+    def test_partial_day_then_grown_file_then_duplicate(self):
+        lines = DAT.splitlines(keepends=True)
+        first = "".join(lines[:2])
+        res = self.send(first)
+        self.assertEqual(res.status_code, 201, res.data)
+        self.assertEqual(res.data["new_readings"], 2)
+        res = self.send(DAT)  # the logger kept writing
+        self.assertEqual(res.status_code, 201, res.data)
+        self.assertEqual(res.data["new_readings"], 1)
+        self.assertEqual(MagnetometerReading.objects.count(), 3)
+        res = self.send(DAT)  # same copy again
+        self.assertEqual(res.data["status"], "already_uploaded")
+        self.assertEqual(MagnetometerReading.objects.count(), 3)
+
+    def test_manifest_lists_days_and_sizes(self):
+        self.send(DAT)
+        res = APIClient().get("/api/magnetometer/station/manifest", HTTP_X_STATION_TOKEN="pi-secret")
+        self.assertEqual(res.data["days"], {"2026-03-03": len(DAT.encode())})
+
+    def test_bad_file_name_is_refused(self):
+        self.assertEqual(self.send(DAT, name="notes.dat").status_code, 400)
