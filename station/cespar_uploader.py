@@ -2,9 +2,11 @@
 """CESPAR magnetometer uploader - runs on the station Raspberry Pi.
 
 Every run (cron, every 15 minutes): ask the website which days it has and
-how big each loaded copy was, then send any MagData_DD_Mon_YYYY.dat file
-in DATA_DIR that is missing there or has grown since (today's file grows
-all day). Files the website already has are never sent again. Missed runs
+how big each loaded copy was, then send any finished MagData_DD_Mon_YYYY.dat
+file in DATA_DIR that is missing there or has grown since. The newest file
+is the one the logger is still writing, so it is held back until the logger
+starts the next day's file - the website's latest day is always a complete
+one. Files the website already has are never sent again. Missed runs
 (power or internet down) catch up on the next one.
 
 Standard library only (the Pi runs Python 3.7). Settings come from
@@ -111,6 +113,9 @@ def main():
         if day and (not since or day >= since):
             files.append((day, os.path.join(data_dir, name)))
     files.sort()
+    if files:
+        held = files.pop()  # still being written by the logger
+        log("holding back %s until the logger starts the next file" % os.path.basename(held[1]))
 
     sent = failed = 0
     for day, path in files:
